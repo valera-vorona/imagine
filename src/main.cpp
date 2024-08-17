@@ -22,6 +22,7 @@
 #define NK_SDL_RENDERER_IMPLEMENTATION
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
+#include "MainView.h"
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
@@ -37,7 +38,7 @@
 /*#define INCLUDE_STYLE */
 /*#define INCLUDE_CALCULATOR */
 /*#define INCLUDE_CANVAS */
-/*#define INCLUDE_OVERVIEW */
+/* #define INCLUDE_OVERVIEW */ 
 /*#define INCLUDE_NODE_EDITOR */
 
 #ifdef INCLUDE_ALL
@@ -58,7 +59,7 @@
   #include "../../demo/common/canvas.c"
 #endif
 #ifdef INCLUDE_OVERVIEW
-  #include "../../demo/common/overview.c"
+  #include "overview.c"
 #endif
 #ifdef INCLUDE_NODE_EDITOR
   #include "../../demo/common/node_editor.c"
@@ -169,7 +170,7 @@ main(int argc, char *argv[])
         nk_input_end(ctx);
 
         /* GUI */
-        if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
+/*        if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
             NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
             NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
         {
@@ -201,6 +202,9 @@ main(int argc, char *argv[])
             }
         }
         nk_end(ctx);
+*/
+        MainView mainView(ctx);
+        mainView.draw();
 
         /* -------------- EXAMPLES ---------------- */
         #ifdef INCLUDE_CALCULATOR

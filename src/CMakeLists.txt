@@ -4,6 +4,7 @@ find_package(SDL2 REQUIRED)
 
 set(SOURCE_EXE
     main.cpp
+    MainView.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_EXE})
