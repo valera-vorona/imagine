@@ -30,3 +30,23 @@
 *.exe
 *.out
 *.app
+
+# Build and release directories
+build/
+release/
+
+# Build and run
+build
+debug
+run
+
+# Generated files
+data/
+doc/
+
+#Backup files
+*.bak
+*.swp
+
+#Misc
+.vscode/
