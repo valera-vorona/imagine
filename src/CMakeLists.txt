@@ -10,6 +10,7 @@ find_package(OpenGL REQUIRED)
 set(SOURCE_EXE
     main.cpp
     MainView.cpp
+    browser.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_EXE})

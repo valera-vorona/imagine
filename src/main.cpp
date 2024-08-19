@@ -4,6 +4,8 @@
 #include "device.h"
 #include "MainView.h"
 
+#include "browser.h"
+
 /* macros */
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
