@@ -6,7 +6,7 @@
 
     }
 
-    void MainView::draw() {
+    void MainView::draw(struct nk_image *image) {
         if (!nk_begin(ctx, "MainView", nk_rect(0, 0, 1200, 800), NK_WINDOW_BORDER)) {
           nk_end(ctx);
           throw std::runtime_error("Error creating MainView");
@@ -26,7 +26,8 @@
         nk_layout_row_template_end(ctx);
 
         nk_label(ctx, "File browzer under construction", NK_TEXT_LEFT);
-        nk_label(ctx, "Image view under construction", NK_TEXT_LEFT);
+        //nk_label(ctx, "Image view under construction", NK_TEXT_LEFT);
+        nk_image(ctx, *image);
         /*nk_layout_row_dynamic(ctx, 0, 2);
             if (nk_group_begin(ctx)) {
                 nk_group_end(ctx);

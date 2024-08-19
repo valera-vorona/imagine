@@ -48,5 +48,11 @@ doc/
 *.bak
 *.swp
 
+#Images
+icon/
+*.jpg
+*.jpeg
+*.png
+
 #Misc
 .vscode/
