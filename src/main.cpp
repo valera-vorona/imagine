@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "nuklear_sdl_renderer.h"
+#include <iostream>
+#include "device.h"
 #include "MainView.h"
 
 /* macros */
@@ -63,8 +64,8 @@ int main(int argc, char *argv[])
     glEnable(GL_TEXTURE_2D);
 
     MainView mainView(&ctx);
-    struct nk_image current = icon_load("../pic.jpg");
-    //struct nk_image current = icon_load("../pic2.png");
+    //struct nk_image current = icon_load("../pic.jpg");
+    struct nk_image current = icon_load("../pic2.png");
 
     while (!glfwWindowShouldClose(win))
     {
