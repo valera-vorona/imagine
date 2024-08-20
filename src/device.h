@@ -1,3 +1,6 @@
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
@@ -6,9 +9,6 @@
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_IMPLEMENTATION
 #include "nuklear.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 /* macros */
 #define MAX_VERTEX_MEMORY 512 * 1024
@@ -47,25 +47,6 @@ struct device {
     GLint uniform_proj;
     GLuint font_tex;
 };
-static struct nk_image
-icon_load(const char *filename)
-{
-    int x,y,n;
-    GLuint tex;
-    unsigned char *data = stbi_load(filename, &x, &y, &n, 0);
-    assert(data);
-
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
-    return nk_image_id((int)tex);
-}
 
 static void
 device_init(struct device *dev)
@@ -274,9 +255,16 @@ device_draw(struct device *dev, struct nk_context *ctx, int width, int height,
 
 
 /* glfw callbacks (I don't know if there is a easier way to access text and scroll )*/
-static void error_callback(int e, const char *d){printf("Error %d: %s\n", e, d);}
-static void text_input(GLFWwindow *win, unsigned int codepoint)
-{nk_input_unicode((struct nk_context*)glfwGetWindowUserPointer(win), codepoint);}
-static void scroll_input(GLFWwindow *win, double _, double yoff)
-{UNUSED(_);nk_input_scroll((struct nk_context*)glfwGetWindowUserPointer(win), nk_vec2(0, (float)yoff));}
+static void error_callback(int e, const char *d){
+    printf("Error %d: %s\n", e, d);
+}
+
+static void text_input(GLFWwindow *win, unsigned int codepoint) {
+    nk_input_unicode((struct nk_context*)glfwGetWindowUserPointer(win), codepoint);
+}
+
+static void scroll_input(GLFWwindow *win, double _, double yoff) {
+    UNUSED(_);
+    nk_input_scroll((struct nk_context*)glfwGetWindowUserPointer(win), nk_vec2(0, (float)yoff));
+}
 

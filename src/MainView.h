@@ -8,12 +8,19 @@
     public:
 
         MainView(nk_context *ctx);
-        virtual ~MainView() = default;
+        virtual ~MainView();
 
-        void draw(struct nk_image *image);
+        void draw();
 
     protected:
+        static const int MAX_PATH_LEN = 4096;
+
         nk_context *ctx;
+
+        bool refresh = true;
+        nk_image *current_image;
+
+        char path_buffer[MAX_PATH_LEN];
     };
 
 

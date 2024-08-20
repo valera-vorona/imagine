@@ -11,6 +11,10 @@ set(SOURCE_EXE
     main.cpp
     MainView.cpp
     browser.cpp
+    FileList.cpp
+    FileBrowser.cpp
+    Model.cpp
+    device.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_EXE})

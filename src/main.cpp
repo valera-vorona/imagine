@@ -1,9 +1,5 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include "device.h"
 #include "MainView.h"
-
+#include "device.h"
 #include "browser.h"
 
 /* macros */
@@ -55,8 +51,8 @@ int main(int argc, char *argv[])
     const char *font_path = (argc > 1) ? argv[1]: 0;
     nk_font_atlas_init_default(&atlas);
     nk_font_atlas_begin(&atlas);
-    if (font_path) font = nk_font_atlas_add_from_file(&atlas, font_path, 13.0f, NULL);
-    else font = nk_font_atlas_add_default(&atlas, 13.0f, NULL);
+    if (font_path) font = nk_font_atlas_add_from_file(&atlas, font_path, 24.0f, NULL);
+    else font = nk_font_atlas_add_default(&atlas, 24.0f, NULL);
     image = nk_font_atlas_bake(&atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
     device_upload_atlas(&device, image, w, h);
     nk_font_atlas_end(&atlas, nk_handle_id((int)device.font_tex), &device.tex_null);}
@@ -66,8 +62,6 @@ int main(int argc, char *argv[])
     glEnable(GL_TEXTURE_2D);
 
     MainView mainView(&ctx);
-    //struct nk_image current = icon_load("../pic.jpg");
-    struct nk_image current = icon_load("../pic2.png");
 
     while (!glfwWindowShouldClose(win))
     {
@@ -81,7 +75,7 @@ int main(int argc, char *argv[])
         /* Input */
         {double x, y;
         nk_input_begin(&ctx);
-        glfwPollEvents();
+        glfwWaitEvents();
         nk_input_key(&ctx, NK_KEY_DEL, glfwGetKey(win, GLFW_KEY_DELETE) == GLFW_PRESS);
         nk_input_key(&ctx, NK_KEY_ENTER, glfwGetKey(win, GLFW_KEY_ENTER) == GLFW_PRESS);
         nk_input_key(&ctx, NK_KEY_TAB, glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS);
@@ -111,7 +105,7 @@ int main(int argc, char *argv[])
         nk_input_end(&ctx);}
 
         /* GUI */
-        mainView.draw(&current);
+        mainView.draw();
 
         /* Draw */
         glViewport(0, 0, display_width, display_height);
@@ -120,8 +114,6 @@ int main(int argc, char *argv[])
         device_draw(&device, &ctx, width, height, scale, NK_ANTI_ALIASING_ON);
         glfwSwapBuffers(win);
     }
-
-    glDeleteTextures(1,(const GLuint*)&current.handle.id);
 
     nk_font_atlas_clear(&atlas);
     nk_free(&ctx);
