@@ -13,7 +13,6 @@
 #include <stdexcept>
 #include <cassert>
 
-
 struct nk_image load_image(const char *filename)
 {
     int x,y,n;
@@ -65,7 +64,12 @@ struct nk_image load_image(const char *filename)
           nk_button_label(ctx, "Edit");
           nk_button_label(ctx, "Help");
 
-        nk_layout_row_static(ctx, 30, 400, 2);
+//        nk_layout_row_static(ctx, 30, 400, 2);
+        nk_layout_row_template_begin(ctx, 32);
+            nk_layout_row_template_push_dynamic(ctx);
+            nk_layout_row_template_push_static(ctx, 32);
+        nk_layout_row_template_end(ctx);
+
             nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, path_buffer, MAX_PATH_LEN, nk_filter_default);
 
             if (nk_button_symbol(ctx, NK_SYMBOL_CIRCLE_OUTLINE)) {

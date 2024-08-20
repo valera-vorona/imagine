@@ -11,9 +11,9 @@ set(SOURCE_EXE
     main.cpp
     MainView.cpp
     browser.cpp
-    FileList.cpp
-    FileBrowser.cpp
-    Model.cpp
+#    FileList.cpp
+#    FileBrowser.cpp
+#    Model.cpp
     device.h
 )
 
