@@ -3,8 +3,8 @@
 #include "browser.h"
 
 /* macros */
-#define WINDOW_WIDTH 1200
-#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH 1600
+#define WINDOW_HEIGHT 1000
 
 int main(int argc, char *argv[])
 {
@@ -61,7 +61,9 @@ int main(int argc, char *argv[])
     /* icons */
     glEnable(GL_TEXTURE_2D);
 
-    MainView mainView(&ctx);
+    //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
+    // but on my device they are the same
+    MainView mainView(&ctx, width, height);
 
     while (!glfwWindowShouldClose(win))
     {
@@ -71,6 +73,10 @@ int main(int argc, char *argv[])
         glfwGetFramebufferSize(win, &display_width, &display_height);
         scale.x = (float)display_width/(float)width;
         scale.y = (float)display_height/(float)height;
+
+        //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
+        // but on my device they are the same
+        mainView.set_size(width, height);
 
         /* Input */
         {double x, y;
