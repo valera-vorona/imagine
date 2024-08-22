@@ -49,13 +49,19 @@ int main(int argc, char *argv[])
     device_init(&device);
     {const void *image; int w, h;
     const char *font_path = (argc > 1) ? argv[1]: 0;
+
+    struct nk_font_config cfg = nk_font_config(14);
+    cfg.range = nk_font_cyrillic_glyph_ranges();
+
     nk_font_atlas_init_default(&atlas);
     nk_font_atlas_begin(&atlas);
-    if (font_path) font = nk_font_atlas_add_from_file(&atlas, font_path, 24.0f, NULL);
-    else font = nk_font_atlas_add_default(&atlas, 24.0f, NULL);
+    if (font_path) font = nk_font_atlas_add_from_file(&atlas, font_path, 24.0f, &cfg);
+    else font = nk_font_atlas_add_default(&atlas, 24.0f, &cfg);
     image = nk_font_atlas_bake(&atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
     device_upload_atlas(&device, image, w, h);
-    nk_font_atlas_end(&atlas, nk_handle_id((int)device.font_tex), &device.tex_null);}
+    nk_font_atlas_end(&atlas, nk_handle_id((int)device.font_tex), &device.tex_null);
+    }
+
     nk_init_default(&ctx, &font->handle);}
 
     /* icons */
