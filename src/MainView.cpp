@@ -46,6 +46,7 @@ struct nk_image load_image(const char *filename)
     ctx(ctx),
     content_width(content_width),
     content_height(content_height),
+    file_browser("/home/valeri/Pictures/2.png"),
     current_image(new struct nk_image) {
         strcpy(path_buffer, "/home/valeri/Pictures/2.png");
         *current_image = load_image(path_buffer);
@@ -111,8 +112,9 @@ struct nk_image load_image(const char *filename)
             nk_list_view out;
             if (nk_list_view_begin(ctx, &out, "File list", NK_WINDOW_BORDER, LINE_HEIGHT, 2)) {
                 nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
-                nk_label(ctx, "File browser under construction", NK_TEXT_LEFT);
-                nk_label(ctx, "File browser under construction", NK_TEXT_LEFT);
+                for (auto e : file_browser.get_dir()) {
+                    nk_label(ctx, e.name.c_str(), NK_TEXT_LEFT);
+                }
 
                 nk_list_view_end(&out);
             }
@@ -120,8 +122,14 @@ struct nk_image load_image(const char *filename)
 
         // Image
         if (refresh) {
-            glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
-            *current_image = load_image(path_buffer);
+            try {
+                file_browser.update(path_buffer);
+
+                glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
+                *current_image = load_image(path_buffer);
+            } catch (std::runtime_error &e) {
+
+            }
 
             refresh = false;
         }

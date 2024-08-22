@@ -12,7 +12,7 @@ set(SOURCE_EXE
     MainView.cpp
     browser.cpp
 #    FileList.cpp
-#    FileBrowser.cpp
+    FileBrowser.cpp
 #    Model.cpp
     device.h
 )

@@ -1,6 +1,8 @@
 #ifndef __MAINVIEW__
 #define __MAINVIEW__
 
+#include "FileBrowser.h"
+
     struct nk_context;
     struct nk_image;
 
@@ -21,6 +23,8 @@
 
         int content_width;
         int content_height;
+
+        FileBrowser file_browser;
 
         bool refresh = true;
         nk_image *current_image;
