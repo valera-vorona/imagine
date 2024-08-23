@@ -9,11 +9,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <algorithm>
 #include <stdexcept>
-#include <cassert>
 
-struct nk_image load_image(const char *filename)
+
+struct nk_image load_image(const char *filename) // throw std::runtine_error
 {
     int x,y,n;
     GLuint tex;
@@ -21,7 +20,10 @@ struct nk_image load_image(const char *filename)
     GLenum fmt;
 
     unsigned char *data = stbi_load(filename, &x, &y, &n, 0);
-    assert(data);
+
+    if (!data) {
+        throw std::runtime_error(std::string("Can't open image file: '") + filename + "'");
+    }
 
     switch (n) {
         case 2: ifmt = GL_RG8; fmt = GL_RG; break;
@@ -43,13 +45,19 @@ struct nk_image load_image(const char *filename)
 }
 
     MainView::MainView(nk_context *ctx, int content_width, int content_height) :
-    ctx(ctx),
-    content_width(content_width),
-    content_height(content_height),
-    file_browser("/home/valeri/Pictures/2.png"),
-    current_image(new struct nk_image) {
-        strcpy(path_buffer, "/home/valeri/Pictures/2.png");
-        *current_image = load_image(path_buffer);
+        ctx(ctx),
+        content_width(content_width),
+        content_height(content_height),
+        file_browser("/home/valeri/Pictures/1.jpg"),
+        current_image(new struct nk_image) {
+
+        strcpy(path_buffer, file_browser.get_full_path().c_str());
+
+        try {
+            *current_image = load_image(path_buffer);
+        } catch (std::runtime_error &e) {
+            status = e.what();
+        }
     }
 
     MainView::~MainView() {
@@ -72,7 +80,8 @@ struct nk_image load_image(const char *filename)
     */
     void MainView::draw() {
         static const int LINE_HEIGHT = 24;
-        std::string status = "Ok";
+
+        status.clear();
 
         if (!nk_begin(ctx, "MainView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {
           nk_end(ctx);
@@ -94,7 +103,12 @@ struct nk_image load_image(const char *filename)
         nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, path_buffer, MAX_PATH_LEN, nk_filter_default);
 
         if (nk_button_symbol(ctx, NK_SYMBOL_CIRCLE_OUTLINE)) {
-            refresh = true;
+            try {
+                file_browser.update(path_buffer);
+                reload_image();
+            } catch (std::runtime_error &e) {
+                status = e.what();
+            }
         }
 
         // Image menu line
@@ -114,13 +128,7 @@ struct nk_image load_image(const char *filename)
             if (nk_list_view_begin(ctx, &out, "File list", NK_WINDOW_BORDER, LINE_HEIGHT, 2)) {
                 nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
 
-                auto files = file_browser.get_dir();
-
-                std::ranges::sort(files, [](const FileBrowser::FileEntry &a, const FileBrowser::FileEntry &b) {
-                    return a.name.compare(b.name) < 0;
-                });
-
-                for (const auto &e : files) {
+                for (const auto &e : file_browser.get_dir()) {
                     if (e.is_active) {
                         nk_style_push_color(ctx, &ctx->style.text.color, nk_rgb(255, 0, 0));
                         nk_label(ctx, e.name.c_str(), NK_TEXT_LEFT);
@@ -135,19 +143,6 @@ struct nk_image load_image(const char *filename)
         }
 
         // Image
-        if (refresh) {
-            try {
-                file_browser.update(path_buffer);
-
-                glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
-                *current_image = load_image(path_buffer);
-            } catch (std::runtime_error &e) {
-                status = e.what();
-            }
-
-            refresh = false;
-        }
-
         nk_image(ctx, *current_image);
 
         // Status bar
@@ -155,5 +150,27 @@ struct nk_image load_image(const char *filename)
           nk_label(ctx, status.c_str(),  NK_TEXT_LEFT);
 
         nk_end(ctx);
+    }
+
+    void MainView::reload_image() {
+        try {
+            glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
+            *current_image = load_image(file_browser.get_full_path().c_str());
+            strcpy(path_buffer, file_browser.get_full_path().c_str());
+        } catch (std::runtime_error &e) {
+            status = e.what();
+        }
+    }
+
+    void MainView::up() {
+        if (file_browser.prev()) {
+            reload_image();
+        }
+    }
+
+    void MainView::down() {
+        if (file_browser.next()) {
+            reload_image();
+        }
     }
 

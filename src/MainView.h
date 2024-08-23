@@ -14,9 +14,14 @@
 
         void set_size(int width, int height);
 
-        void draw();
+        void draw(); // throw std::runtime_error
+
+        void up();
+        void down();
 
     protected:
+        void reload_image();
+
         static const int MAX_PATH_LEN = 4096;
 
         nk_context *ctx;
@@ -26,10 +31,10 @@
 
         FileBrowser file_browser;
 
-        bool refresh = true;
         nk_image *current_image;
 
         char path_buffer[MAX_PATH_LEN];
+        std::string status;
     };
 
 

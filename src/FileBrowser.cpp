@@ -1,5 +1,6 @@
 #include "FileBrowser.h"
 #include <filesystem>
+#include <algorithm>
 #include <stdexcept>
 
     FileBrowser::FileBrowser(std::string path) : path(path) {
@@ -9,7 +10,7 @@
     void FileBrowser::update(std::string path) {
         namespace fs = std::filesystem;
 
-        this->path = fs::u8path(path);
+        this->full_path = this->path = fs::u8path(path);
 
         const auto status = fs::status(this->path);
 
@@ -33,6 +34,40 @@
                 current
             });
         }
+
+        std::ranges::sort(files, [](const FileBrowser::FileEntry &a, const FileBrowser::FileEntry &b) {
+             return a.name.compare(b.name) < 0;
+        });
+
     }
 
+    bool FileBrowser::prev() {
+        auto entry = std::ranges::find_if(files, [](const FileEntry &e) {
+            return e.is_active == true;
+        });
+
+        if (entry != files.end() && entry != files.begin() && entry - 1 != files.begin()) {
+            entry->is_active = false;
+            (entry - 1)->is_active = true;
+            full_path = path / (entry - 1)->name;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool FileBrowser::next() {
+        auto entry = std::ranges::find_if(files, [](const FileEntry &e) {
+            return e.is_active == true;
+        });
+
+        if (entry != files.end() && entry + 1 != files.end()) {
+            entry->is_active = false;
+            (entry + 1)->is_active = true;
+            full_path = path / (entry + 1)->name;
+            return true;
+        } else {
+            return false;
+        }
+    }
 

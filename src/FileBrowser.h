@@ -22,12 +22,24 @@
 
         void update(std::string path); // throw std::runtime_error()
 
-        inline const Files &get_dir() {
+        bool prev();
+        bool next();
+
+        inline std::string get_path() const {
+            return path;
+        }
+
+        inline std::string get_full_path() const {
+            return full_path;
+        }
+
+        inline const Files &get_dir() const {
             return files;
         }
 
     protected:
         std::filesystem::path path;
+        std::filesystem::path full_path;
         Files files;
     };
 

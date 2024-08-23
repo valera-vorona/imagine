@@ -88,6 +88,12 @@ int main(int argc, char *argv[])
         {double x, y;
         nk_input_begin(&ctx);
         glfwWaitEvents();
+        if (glfwGetKey(win, GLFW_KEY_UP) == GLFW_PRESS) {
+            mainView.up();
+        }
+        if (glfwGetKey(win, GLFW_KEY_DOWN) == GLFW_PRESS) {
+            mainView.down();
+        }
         nk_input_key(&ctx, NK_KEY_DEL, glfwGetKey(win, GLFW_KEY_DELETE) == GLFW_PRESS);
         nk_input_key(&ctx, NK_KEY_ENTER, glfwGetKey(win, GLFW_KEY_ENTER) == GLFW_PRESS);
         nk_input_key(&ctx, NK_KEY_TAB, glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS);
