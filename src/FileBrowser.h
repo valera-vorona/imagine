@@ -20,7 +20,8 @@
 
         typedef std::vector<FileEntry> Files;
 
-        void update(std::string path); // throw std::runtime_error()
+        void update_path(std::string path, bool force_update = false); // throw std::runtime_error()
+        void update_file(std::string file, bool force_update = false);
 
         bool prev();
         bool next();
@@ -36,6 +37,8 @@
         inline const Files &get_dir() const {
             return files;
         }
+
+        bool is_dir() const;
 
     protected:
         std::filesystem::path path;

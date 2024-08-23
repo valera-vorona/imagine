@@ -104,7 +104,7 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
 
         if (nk_button_symbol(ctx, NK_SYMBOL_CIRCLE_OUTLINE)) {
             try {
-                file_browser.update(path_buffer);
+                file_browser.update_path(path_buffer);
                 reload_image();
             } catch (std::runtime_error &e) {
                 status = e.what();
@@ -129,12 +129,18 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
                 nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
 
                 for (const auto &e : file_browser.get_dir()) {
+                    nk_symbol_type symbol = e.is_directory ? NK_SYMBOL_TRIANGLE_RIGHT : NK_SYMBOL_NONE;
                     if (e.is_active) {
-                        nk_style_push_color(ctx, &ctx->style.text.color, nk_rgb(255, 0, 0));
-                        nk_label(ctx, e.name.c_str(), NK_TEXT_LEFT);
-                        nk_style_pop_color(ctx);
+                        nk_style_push_style_item(ctx, &ctx->style.button.normal, nk_style_item_color(nk_rgb(255, 0, 0)));
+                        nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT);
+                        nk_style_pop_style_item(ctx);
                     } else {
-                        nk_label(ctx, e.name.c_str(), NK_TEXT_LEFT);
+                        if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
+                            file_browser.update_file(e.name);
+                            if (!file_browser.is_dir()) {
+                                reload_image();
+                            }
+                        }
                     }
                 }
 
@@ -163,13 +169,13 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
     }
 
     void MainView::up() {
-        if (file_browser.prev()) {
+        if (file_browser.prev() && !file_browser.is_dir()) {
             reload_image();
         }
     }
 
     void MainView::down() {
-        if (file_browser.next()) {
+        if (file_browser.next() && !file_browser.is_dir()) {
             reload_image();
         }
     }

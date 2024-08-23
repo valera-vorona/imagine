@@ -4,41 +4,60 @@
 #include <stdexcept>
 
     FileBrowser::FileBrowser(std::string path) : path(path) {
-        update(path);
+        update_path(path); //TODO: update() can crash, I should process it here somehow
     }
 
-    void FileBrowser::update(std::string path) {
+    void FileBrowser::update_path(std::string path, bool force_update) {
         namespace fs = std::filesystem;
 
-        this->full_path = this->path = fs::u8path(path);
+        fs::path in_full_path = fs::u8path(path);
 
-        const auto status = fs::status(this->path);
+        if (!force_update && this->full_path == in_full_path) return;
 
-        if (!fs::exists(status)) {
-            throw std::runtime_error("Incorrect path");
-        }
+        fs::path in_path = in_full_path;
+        in_path.remove_filename();
 
-        std::string filename;
+        auto filename = in_full_path.filename();
 
-        if (!fs::is_directory(status)) {
-            filename = this->path.filename();
-            this->path.remove_filename();
-        }
- 
-        files.clear();
-        for (const auto &entry : fs::directory_iterator(this->path, fs::directory_options::follow_directory_symlink)) {
-            auto current = entry.path().filename().string();
-            files.push_back({
-                fs::is_directory(entry),
-                filename == current ? true : false,
-                current
-            });
+        if (force_update || this->path != in_path) {
+
+            const auto status = fs::status(in_full_path);
+
+            if (!fs::exists(status)) {
+                throw std::runtime_error("Incorrect path");
+            }
+
+            this->full_path = in_full_path;
+            this->path = in_path;
+
+            files.clear();
+
+            for (const auto &entry : fs::directory_iterator(this->path, fs::directory_options::follow_directory_symlink)) {
+                auto current = entry.path().filename().string();
+                files.push_back({
+                    fs::is_directory(entry),
+                    filename == current ? true : false,
+                    current
+                });
+            }
+        } else {
+                this->full_path = in_full_path;
+
+            for (auto &entry : files) {
+                entry.is_active = (filename == entry.name) ? true : false;
+            }
         }
 
         std::ranges::sort(files, [](const FileBrowser::FileEntry &a, const FileBrowser::FileEntry &b) {
-             return a.name.compare(b.name) < 0;
+            if (a.is_directory < b.is_directory) return false;
+            if (a.is_directory > b.is_directory) return true;
+            return a.name.compare(b.name) < 0;
         });
 
+    }
+
+    void FileBrowser::update_file(std::string file, bool force_update) {
+        update_path(this->path / file, force_update);
     }
 
     bool FileBrowser::prev() {
@@ -46,7 +65,7 @@
             return e.is_active == true;
         });
 
-        if (entry != files.end() && entry != files.begin() && entry - 1 != files.begin()) {
+        if (entry != files.end() && entry != files.begin()) {
             entry->is_active = false;
             (entry - 1)->is_active = true;
             full_path = path / (entry - 1)->name;
@@ -69,5 +88,11 @@
         } else {
             return false;
         }
+    }
+
+    bool FileBrowser::is_dir() const {
+        namespace fs = std::filesystem;
+
+        return fs::is_directory(fs::status(full_path));
     }
 
