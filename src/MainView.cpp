@@ -130,17 +130,25 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
 
                 for (const auto &e : file_browser.get_dir()) {
                     nk_symbol_type symbol = e.is_directory ? NK_SYMBOL_TRIANGLE_RIGHT : NK_SYMBOL_NONE;
+                    bool pushed = false;
                     if (e.is_active) {
                         nk_style_push_style_item(ctx, &ctx->style.button.normal, nk_style_item_color(nk_rgb(255, 0, 0)));
-                        nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT);
-                        nk_style_pop_style_item(ctx);
-                    } else {
-                        if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
+                        pushed = true;
+                    }
+
+                    if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
+                        try {
                             file_browser.update_file(e.name);
                             if (!file_browser.is_dir()) {
                                 reload_image();
                             }
+                        } catch (std::runtime_error &e) {
+                            status = e.what();
                         }
+                    }
+
+                    if (pushed) {
+                        nk_style_pop_style_item(ctx);
                     }
                 }
 

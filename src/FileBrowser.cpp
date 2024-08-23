@@ -14,23 +14,27 @@
 
         if (!force_update && this->full_path == in_full_path) return;
 
+        const auto status = fs::status(in_full_path);
+
+        if (!fs::exists(status)) {
+            throw std::runtime_error("Incorrect path");
+        }
+
         fs::path in_path = in_full_path;
-        in_path.remove_filename();
+
+        if (!fs::is_directory(status)) {
+            in_path.remove_filename();
+        }
 
         auto filename = in_full_path.filename();
 
         if (force_update || this->path != in_path) {
-
-            const auto status = fs::status(in_full_path);
-
-            if (!fs::exists(status)) {
-                throw std::runtime_error("Incorrect path");
-            }
-
             this->full_path = in_full_path;
             this->path = in_path;
 
             files.clear();
+
+            files.push_back({true, false, ".."});
 
             for (const auto &entry : fs::directory_iterator(this->path, fs::directory_options::follow_directory_symlink)) {
                 auto current = entry.path().filename().string();
@@ -40,20 +44,21 @@
                     current
                 });
             }
+
+            std::ranges::sort(files, [](const FileBrowser::FileEntry &a, const FileBrowser::FileEntry &b) {
+                if (a.name == "..") return true;
+                if (b.name == "..") return false;
+                if (a.is_directory < b.is_directory) return false;
+                if (a.is_directory > b.is_directory) return true;
+                return a.name.compare(b.name) < 0;
+            });
         } else {
-                this->full_path = in_full_path;
+            this->full_path = in_full_path;
 
             for (auto &entry : files) {
                 entry.is_active = (filename == entry.name) ? true : false;
             }
         }
-
-        std::ranges::sort(files, [](const FileBrowser::FileEntry &a, const FileBrowser::FileEntry &b) {
-            if (a.is_directory < b.is_directory) return false;
-            if (a.is_directory > b.is_directory) return true;
-            return a.name.compare(b.name) < 0;
-        });
-
     }
 
     void FileBrowser::update_file(std::string file, bool force_update) {
