@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <cstring>
+#include <algorithm>
 #include <stdexcept>
 #include <cassert>
 
@@ -72,6 +72,7 @@ struct nk_image load_image(const char *filename)
     */
     void MainView::draw() {
         static const int LINE_HEIGHT = 24;
+        std::string status = "Ok";
 
         if (!nk_begin(ctx, "MainView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {
           nk_end(ctx);
@@ -112,8 +113,21 @@ struct nk_image load_image(const char *filename)
             nk_list_view out;
             if (nk_list_view_begin(ctx, &out, "File list", NK_WINDOW_BORDER, LINE_HEIGHT, 2)) {
                 nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
-                for (auto e : file_browser.get_dir()) {
-                    nk_label(ctx, e.name.c_str(), NK_TEXT_LEFT);
+
+                auto files = file_browser.get_dir();
+
+                std::ranges::sort(files, [](const FileBrowser::FileEntry &a, const FileBrowser::FileEntry &b) {
+                    return a.name.compare(b.name) < 0;
+                });
+
+                for (const auto &e : files) {
+                    if (e.is_active) {
+                        nk_style_push_color(ctx, &ctx->style.text.color, nk_rgb(255, 0, 0));
+                        nk_label(ctx, e.name.c_str(), NK_TEXT_LEFT);
+                        nk_style_pop_color(ctx);
+                    } else {
+                        nk_label(ctx, e.name.c_str(), NK_TEXT_LEFT);
+                    }
                 }
 
                 nk_list_view_end(&out);
@@ -128,7 +142,7 @@ struct nk_image load_image(const char *filename)
                 glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
                 *current_image = load_image(path_buffer);
             } catch (std::runtime_error &e) {
-
+                status = e.what();
             }
 
             refresh = false;
@@ -138,7 +152,7 @@ struct nk_image load_image(const char *filename)
 
         // Status bar
         nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
-          nk_label(ctx, "Status bar under construction",  NK_TEXT_LEFT);
+          nk_label(ctx, status.c_str(),  NK_TEXT_LEFT);
 
         nk_end(ctx);
     }

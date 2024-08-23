@@ -1,7 +1,7 @@
 #ifndef __FILEBROWSER__
 #define __FILEBROWSER__
 
-#include <list>
+#include <vector>
 #include <string>
 #include <filesystem>
 
@@ -10,6 +10,7 @@
 
         struct FileEntry {
             bool is_directory;
+            bool is_active;
             std::string name;
         };
 
@@ -17,11 +18,11 @@
 
         ~FileBrowser() = default;
 
-        typedef std::list<FileEntry> Files;
+        typedef std::vector<FileEntry> Files;
 
         void update(std::string path); // throw std::runtime_error()
 
-        inline Files get_dir() {
+        inline const Files &get_dir() {
             return files;
         }
 

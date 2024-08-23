@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <stdexcept>
 
-
     FileBrowser::FileBrowser(std::string path) : path(path) {
         update(path);
     }
@@ -18,15 +17,20 @@
             throw std::runtime_error("Incorrect path");
         }
 
+        std::string filename;
+
         if (!fs::is_directory(status)) {
+            filename = this->path.filename();
             this->path.remove_filename();
         }
  
         files.clear();
         for (const auto &entry : fs::directory_iterator(this->path, fs::directory_options::follow_directory_symlink)) {
+            auto current = entry.path().filename().string();
             files.push_back({
                 fs::is_directory(entry),
-                entry.path().filename().string()
+                filename == current ? true : false,
+                current
             });
         }
     }
