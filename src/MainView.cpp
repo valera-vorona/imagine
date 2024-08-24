@@ -117,44 +117,52 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
 
         // Main part
         // Height is calculated from the window content region height - sum of all the others' widget sizes
-        nk_layout_row_template_begin(ctx, nk_window_get_content_region_size(ctx).y - LINE_HEIGHT * 7);
+        int height = nk_window_get_content_region_size(ctx).y - LINE_HEIGHT * 7;
+        int y_offset = 0; // offset in pixels of the active file
+        nk_layout_row_template_begin(ctx, height);
             nk_layout_row_template_push_static(ctx, 400);
             nk_layout_row_template_push_static(ctx, nk_window_get_content_region_size(ctx).y - 400);
         nk_layout_row_template_end(ctx);
 
-        {
-            //  File list
-            nk_list_view out;
-            if (nk_list_view_begin(ctx, &out, "File list", NK_WINDOW_BORDER, LINE_HEIGHT, 2)) {
-                nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
+        //  File list
+        if (nk_group_begin(ctx, "File list", NK_WINDOW_BORDER)) {
+            bool active_gone_through = false;
 
-                for (const auto &e : file_browser.get_dir()) {
-                    nk_symbol_type symbol = e.is_directory ? NK_SYMBOL_TRIANGLE_RIGHT : NK_SYMBOL_NONE;
-                    bool pushed = false;
-                    if (e.is_active) {
-                        nk_style_push_style_item(ctx, &ctx->style.button.normal, nk_style_item_color(nk_rgb(255, 0, 0)));
-                        pushed = true;
-                    }
+            nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
 
-                    if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
-                        try {
-                            file_browser.update_file(e.name);
-                            if (!file_browser.is_dir()) {
-                                reload_image();
-                            }
-                        } catch (std::runtime_error &e) {
-                            status = e.what();
+            for (const auto &e : file_browser.get_dir()) {
+                nk_symbol_type symbol = e.is_directory ? NK_SYMBOL_TRIANGLE_RIGHT : NK_SYMBOL_NONE;
+                bool pushed = false;
+                if (e.is_active) {
+                    nk_style_push_style_item(ctx, &ctx->style.button.normal, nk_style_item_color(nk_rgb(255, 0, 0)));
+                    active_gone_through = true;
+                    pushed = true;
+                }
+
+                if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
+                    try {
+                        file_browser.update_file(e.name);
+                        if (!file_browser.is_dir()) {
+                            reload_image();
                         }
-                    }
-
-                    if (pushed) {
-                        nk_style_pop_style_item(ctx);
+                    } catch (std::runtime_error &e) {
+                        status = e.what();
                     }
                 }
 
-                nk_list_view_end(&out);
+                if (!active_gone_through) {
+                    y_offset += LINE_HEIGHT;;
+                }
+
+                if (pushed) {
+                    nk_style_pop_style_item(ctx);
+                }
             }
+
+            nk_group_end(ctx);
         }
+
+        //nk_group_set_scroll(ctx, "File list", 0, y_offset);
 
         // Image
         nk_image(ctx, *current_image);
