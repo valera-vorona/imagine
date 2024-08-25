@@ -121,7 +121,7 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
         int y_offset = 0; // offset in pixels of the active file
         nk_layout_row_template_begin(ctx, height);
             nk_layout_row_template_push_static(ctx, 400);
-            nk_layout_row_template_push_static(ctx, nk_window_get_content_region_size(ctx).y - 400);
+            nk_layout_row_template_push_static(ctx, nk_window_get_content_region_size(ctx).x - 400);
         nk_layout_row_template_end(ctx);
 
         //  File list
