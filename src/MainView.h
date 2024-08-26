@@ -9,6 +9,7 @@
     struct image_meta {
         int w;
         int h;
+        int n;
     };
 
     class MainView {

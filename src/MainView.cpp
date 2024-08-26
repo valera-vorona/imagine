@@ -31,6 +31,9 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         default: ifmt = GL_R8; fmt = GL_R; break;
     }
 
+    // OpenGL default alignment is 4, correct it if necessary
+    (x * n) % 4 ? glPixelStorei(GL_UNPACK_ALIGNMENT, 1) : glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
@@ -44,6 +47,7 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     if (image_meta) {
         image_meta->w = x;
         image_meta->h = y;
+        image_meta->n = n;
     }
     return nk_image_id((int)tex);
 }
@@ -187,7 +191,9 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
                 nk_image(ctx, *current_image);
             }
 
-            status = std::string("w: ") + std::to_string(current_image_meta.w) + std::string(", h: ") + std::to_string(current_image_meta.h);
+            status = std::string("w: ") + std::to_string(current_image_meta.w) +
+                std::string(", h: ") + std::to_string(current_image_meta.h) +
+                std::string(", n: ") + std::to_string(current_image_meta.n);
             nk_group_end(ctx);
         }
 
