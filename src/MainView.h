@@ -6,6 +6,11 @@
     struct nk_context;
     struct nk_image;
 
+    struct image_meta {
+        int w;
+        int h;
+    };
+
     class MainView {
     public:
 
@@ -32,6 +37,7 @@
         FileBrowser file_browser;
 
         nk_image *current_image;
+        struct image_meta current_image_meta;
 
         char path_buffer[MAX_PATH_LEN];
         std::string status;

@@ -11,8 +11,7 @@
 
 #include <stdexcept>
 
-
-struct nk_image load_image(const char *filename) // throw std::runtine_error
+struct nk_image load_image(const char *filename, struct image_meta *image_meta) // throw std::runtine_error
 {
     int x,y,n;
     GLuint tex;
@@ -41,6 +40,11 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
     glTexImage2D(GL_TEXTURE_2D, 0, ifmt, x, y, 0, fmt, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
+
+    if (image_meta) {
+        image_meta->w = x;
+        image_meta->h = y;
+    }
     return nk_image_id((int)tex);
 }
 
@@ -54,7 +58,7 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
         strcpy(path_buffer, file_browser.get_full_path().c_str());
 
         try {
-            *current_image = load_image(path_buffer);
+            *current_image = load_image(path_buffer, &current_image_meta);
         } catch (std::runtime_error &e) {
             status = e.what();
         }
@@ -116,12 +120,14 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
           nk_label(ctx, "Image menu under construction", NK_TEXT_LEFT);
 
         // Main part
+        // Width is the whole window width - width of file list
+        int width = nk_window_get_content_region_size(ctx).x - 400;
         // Height is calculated from the window content region height - sum of all the others' widget sizes
         int height = nk_window_get_content_region_size(ctx).y - LINE_HEIGHT * 7;
         int y_offset = 0; // offset in pixels of the active file
         nk_layout_row_template_begin(ctx, height);
             nk_layout_row_template_push_static(ctx, 400);
-            nk_layout_row_template_push_static(ctx, nk_window_get_content_region_size(ctx).x - 400);
+            nk_layout_row_template_push_static(ctx, width);
         nk_layout_row_template_end(ctx);
 
         //  File list
@@ -165,7 +171,25 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
         //nk_group_set_scroll(ctx, "File list", 0, y_offset);
 
         // Image
-        nk_image(ctx, *current_image);
+        if (nk_group_begin(ctx, "Image", NK_WINDOW_BORDER)) {
+            width -= 20;
+            height -= 20; // deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
+
+            // calculating aspect ratios of the image and the view
+            const float ar_image = (float)current_image_meta.w / (float)current_image_meta.h;
+            const float ar_view  = (float)width / (float)height;
+
+            if (ar_image > ar_view) {
+                nk_layout_row_static(ctx, (float)width / ar_image , width, 1);
+                nk_image(ctx, *current_image);
+            } else {
+                nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
+                nk_image(ctx, *current_image);
+            }
+
+            status = std::string("w: ") + std::to_string(current_image_meta.w) + std::string(", h: ") + std::to_string(current_image_meta.h);
+            nk_group_end(ctx);
+        }
 
         // Status bar
         nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
@@ -177,7 +201,7 @@ struct nk_image load_image(const char *filename) // throw std::runtine_error
     void MainView::reload_image() {
         try {
             glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
-            *current_image = load_image(file_browser.get_full_path().c_str());
+            *current_image = load_image(file_browser.get_full_path().c_str(), &current_image_meta);
             strcpy(path_buffer, file_browser.get_full_path().c_str());
         } catch (std::runtime_error &e) {
             status = e.what();
