@@ -32,7 +32,7 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     }
 
     // OpenGL default alignment is 4, correct it if necessary
-    (x * n) % 4 ? glPixelStorei(GL_UNPACK_ALIGNMENT, 1) : glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, (x * n) % 4 ? 1 : 4);
 
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
