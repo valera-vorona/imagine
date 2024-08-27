@@ -268,6 +268,30 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
 
     if (action == GLFW_PRESS || action == GLFW_REPEAT) {
         switch (key) {
+            case GLFW_KEY_DELETE:
+                nk_input_key(mainView->get_context(), NK_KEY_DEL, 1);
+                break;
+
+            case GLFW_KEY_ENTER:
+                nk_input_key(mainView->get_context(), NK_KEY_ENTER, 1);
+                break;
+
+            case GLFW_KEY_TAB:
+                nk_input_key(mainView->get_context(), NK_KEY_TAB, 1);
+                break;
+
+            case GLFW_KEY_BACKSPACE:
+                nk_input_key(mainView->get_context(), NK_KEY_BACKSPACE, 1);
+                break;
+
+            case GLFW_KEY_LEFT:
+                nk_input_key(mainView->get_context(), NK_KEY_LEFT, 1);
+                break;
+
+            case GLFW_KEY_RIGHT:
+                nk_input_key(mainView->get_context(), NK_KEY_RIGHT, 1);
+                break;
+
             case GLFW_KEY_UP:
                 mainView->up();
                 break;
