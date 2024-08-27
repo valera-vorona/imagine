@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
 #endif
     win = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Imagine", NULL, NULL);
     glfwMakeContextCurrent(win);
-    glfwSetWindowUserPointer(win, &ctx);
     glfwSetCharCallback(win, text_input);
+    glfwSetKeyCallback(win, key_input);
     glfwSetScrollCallback(win, scroll_input);
 
     /* OpenGL */
@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
     //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
     // but on my device they are the same
     MainView mainView(&ctx, width, height);
+    glfwSetWindowUserPointer(win, &mainView);
 
     while (!glfwWindowShouldClose(win))
     {
@@ -88,12 +89,7 @@ int main(int argc, char *argv[])
         {double x, y;
         nk_input_begin(&ctx);
         glfwWaitEvents();
-        if (glfwGetKey(win, GLFW_KEY_UP) == GLFW_PRESS) {
-            mainView.up();
-        }
-        if (glfwGetKey(win, GLFW_KEY_DOWN) == GLFW_PRESS) {
-            mainView.down();
-        }
+
         nk_input_key(&ctx, NK_KEY_DEL, glfwGetKey(win, GLFW_KEY_DELETE) == GLFW_PRESS);
         nk_input_key(&ctx, NK_KEY_ENTER, glfwGetKey(win, GLFW_KEY_ENTER) == GLFW_PRESS);
         nk_input_key(&ctx, NK_KEY_TAB, glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS);
@@ -115,6 +111,7 @@ int main(int argc, char *argv[])
             nk_input_key(&ctx, NK_KEY_CUT, 0);
             nk_input_key(&ctx, NK_KEY_SHIFT, 0);
         }
+
         glfwGetCursorPos(win, &x, &y);
         nk_input_motion(&ctx, (int)x, (int)y);
         nk_input_button(&ctx, NK_BUTTON_LEFT, (int)x, (int)y, glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
@@ -139,5 +136,4 @@ int main(int argc, char *argv[])
     glfwTerminate();
     return 0;
 }
-
 

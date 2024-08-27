@@ -255,16 +255,32 @@ device_draw(struct device *dev, struct nk_context *ctx, int width, int height,
 
 
 /* glfw callbacks (I don't know if there is a easier way to access text and scroll )*/
-static void error_callback(int e, const char *d){
+void error_callback(int e, const char *d){
     printf("Error %d: %s\n", e, d);
 }
 
-static void text_input(GLFWwindow *win, unsigned int codepoint) {
-    nk_input_unicode((struct nk_context*)glfwGetWindowUserPointer(win), codepoint);
+void text_input(GLFWwindow *win, unsigned int codepoint) {
+    nk_input_unicode((struct nk_context*)((MainView *)glfwGetWindowUserPointer(win))->get_context(), codepoint);
 }
 
-static void scroll_input(GLFWwindow *win, double _, double yoff) {
+void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
+    MainView *mainView = (MainView *)glfwGetWindowUserPointer(win);
+
+    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+        switch (key) {
+            case GLFW_KEY_UP:
+                mainView->up();
+                break;
+
+            case GLFW_KEY_DOWN:
+                mainView->down();
+                break;
+        }
+    }
+}
+
+void scroll_input(GLFWwindow *win, double _, double yoff) {
     UNUSED(_);
-    nk_input_scroll((struct nk_context*)glfwGetWindowUserPointer(win), nk_vec2(0, (float)yoff));
+    nk_input_scroll((struct nk_context*)((MainView *)glfwGetWindowUserPointer(win))->get_context(), nk_vec2(0, (float)yoff));
 }
 

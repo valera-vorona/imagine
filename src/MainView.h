@@ -18,6 +18,8 @@
         MainView(nk_context *ctx, int content_width, int content_height);
         virtual ~MainView();
 
+        inline nk_context *get_context() { return ctx; }
+
         void set_size(int width, int height);
 
         void draw(); // throw std::runtime_error
