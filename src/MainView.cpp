@@ -12,6 +12,9 @@
 #include <fstream>
 #include <stdexcept>
 
+/* config constants */
+const std::string CFG_LATEST_SEEN = "latest_seen";
+
 struct nk_image load_image(const char *filename, struct image_meta *image_meta) // throw std::runtine_error
 {
     int x,y,n;
@@ -54,18 +57,19 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 }
 
     MainView::MainView(std::string config_file, nk_context *ctx, int content_width, int content_height) :
-//        config(config_file),
+        config_file(config_file),
         ctx(ctx),
         content_width(content_width),
         content_height(content_height),
-        //file_browser(config["latest_seen"].get<std::string>()),//"/home/valeri/Pictures/1.jpg"),
-//        file_browser("/home/valeri/Pictures/1.jpg"),
         current_image(new struct nk_image) {
 
-//        std::ifstream icfg(config_file);
-//        config = nlohmann::json::parse(icfg);
+        std::ifstream config_stream(config_file); 
+        config = nlohmann::json::parse(config_stream);
+        config_stream.close();
 
-        file_browser.update_path("/home/valeri/Pictures/1.jpg");
+        adopt_config();
+
+        file_browser.update_path(config[CFG_LATEST_SEEN].get<std::string>());
 
         strcpy(path_buffer, file_browser.get_full_path().c_str());
 
@@ -79,6 +83,9 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     MainView::~MainView() {
         glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
         delete current_image;
+
+        std::ofstream config_stream(config_file, std::ofstream::out | std::ofstream::trunc);
+        config_stream << config;
     }
 
     void MainView::set_size(int width, int height) {
@@ -217,6 +224,7 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
             glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
             *current_image = load_image(file_browser.get_full_path().c_str(), &current_image_meta);
             strcpy(path_buffer, file_browser.get_full_path().c_str());
+            config[CFG_LATEST_SEEN] = path_buffer;
         } catch (std::runtime_error &e) {
             status = e.what();
         }
@@ -231,6 +239,12 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     void MainView::down() {
         if (file_browser.next() && !file_browser.is_dir()) {
             reload_image();
+        }
+    }
+
+    void MainView::adopt_config() {
+        if (!config[CFG_LATEST_SEEN].is_string()) {
+             config[CFG_LATEST_SEEN] = "/"; //TODO: I should use a more smart way here to find the home dir like it is done in the main function
         }
     }
 

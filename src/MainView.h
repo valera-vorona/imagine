@@ -33,7 +33,11 @@
     protected:
         void reload_image();
 
+        void adopt_config();
+
         static const int MAX_PATH_LEN = 4096;
+
+        std::string config_file;
 
         nlohmann::json config;
 

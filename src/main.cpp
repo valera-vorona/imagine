@@ -1,18 +1,19 @@
 #include "MainView.h"
 #include "device.h"
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include "browser.h"
 
 #ifndef _WIN32
 #include <pwd.h>
 #endif
 
-/* macros */
-#define WINDOW_WIDTH 1600
-#define WINDOW_HEIGHT 1000
+/* consts */
+const int         DEFAULT_WINDOW_WIDTH  = 1600;
+const int         DEFAULT_WINDOW_HEIGHT = 1000;
 
-const std::string IMAGE_DIR     = ".image";
-const std::string IMAGE_CONFIG  = "image.conf";
+const std::string IMAGE_DIR             = ".image";
+const std::string IMAGE_CONFIG          = "image.conf";
 
 int main(int argc, char *argv[])
 {
@@ -59,6 +60,24 @@ int main(int argc, char *argv[])
         }
     }
 
+    std::fstream config_stream{ config_file };
+    nlohmann::json config = nlohmann::json::parse(config_stream);
+    config_stream.close();
+
+    try {
+        width  = config["width"].get<int>();
+    } catch (nlohmann::json::basic_json::exception &e) {
+        width = DEFAULT_WINDOW_WIDTH;
+    }
+
+    try {
+        height  = config["height"].get<int>();
+    } catch (nlohmann::json::basic_json::exception &e) {
+        height = DEFAULT_WINDOW_HEIGHT;
+    }
+
+    config_stream.seekg(0, config_stream.beg);
+
     /* GLFW */
     glfwSetErrorCallback(error_callback);
     if (!glfwInit()) {
@@ -71,14 +90,14 @@ int main(int argc, char *argv[])
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-    win = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Imagine", NULL, NULL);
+    win = glfwCreateWindow(width, height, "Imagine", NULL, NULL);
     glfwMakeContextCurrent(win);
     glfwSetCharCallback(win, text_input);
     glfwSetKeyCallback(win, key_input);
     glfwSetScrollCallback(win, scroll_input);
 
     /* OpenGL */
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glViewport(0, 0, width, height);
     glewExperimental = 1;
     if (glewInit() != GLEW_OK) {
         fprintf(stderr, "Failed to setup GLEW\n");
@@ -109,7 +128,8 @@ int main(int argc, char *argv[])
 
     //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
     // but on my device they are the same
-    MainView mainView("ff", &ctx, width, height);
+    glfwGetWindowSize(win, &width, &height);
+    MainView mainView(config_file, &ctx, width, height);
     glfwSetWindowUserPointer(win, &mainView);
 
     while (!glfwWindowShouldClose(win))
