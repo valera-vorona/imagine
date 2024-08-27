@@ -10,5 +10,6 @@ add_subdirectory(src)
 
 # install
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-install(FILES .imagine DESTINATION $ENV{HOME}/.${PROJECT_NAME})
+#install(DIRECTORY .imagine DESTINATION $ENV{HOME}/.${PROJECT_NAME} FILES_MATCHING_PATTERN "*")
+#install(FILES .ima:gine DESTINATION $ENV{HOME}/.${PROJECT_NAME})
 
