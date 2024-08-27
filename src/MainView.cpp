@@ -9,6 +9,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <fstream>
 #include <stdexcept>
 
 struct nk_image load_image(const char *filename, struct image_meta *image_meta) // throw std::runtine_error
@@ -52,12 +53,19 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     return nk_image_id((int)tex);
 }
 
-    MainView::MainView(nk_context *ctx, int content_width, int content_height) :
+    MainView::MainView(std::string config_file, nk_context *ctx, int content_width, int content_height) :
+//        config(config_file),
         ctx(ctx),
         content_width(content_width),
         content_height(content_height),
-        file_browser("/home/valeri/Pictures/1.jpg"),
+        //file_browser(config["latest_seen"].get<std::string>()),//"/home/valeri/Pictures/1.jpg"),
+//        file_browser("/home/valeri/Pictures/1.jpg"),
         current_image(new struct nk_image) {
+
+//        std::ifstream icfg(config_file);
+//        config = nlohmann::json::parse(icfg);
+
+        file_browser.update_path("/home/valeri/Pictures/1.jpg");
 
         strcpy(path_buffer, file_browser.get_full_path().c_str());
 

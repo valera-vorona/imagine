@@ -2,6 +2,7 @@
 #define __MAINVIEW__
 
 #include "FileBrowser.h"
+#include <nlohmann/json.hpp>
 
     struct nk_context;
     struct nk_image;
@@ -15,10 +16,12 @@
     class MainView {
     public:
 
-        MainView(nk_context *ctx, int content_width, int content_height);
+        MainView(std::string config_file, nk_context *ctx, int content_width, int content_height);
         virtual ~MainView();
 
         inline nk_context *get_context() { return ctx; }
+        inline int get_width() const { return content_width; }
+        inline int get_height() const { return content_height; }
 
         void set_size(int width, int height);
 
@@ -31,6 +34,8 @@
         void reload_image();
 
         static const int MAX_PATH_LEN = 4096;
+
+        nlohmann::json config;
 
         nk_context *ctx;
 

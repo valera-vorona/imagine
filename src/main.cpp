@@ -1,10 +1,18 @@
 #include "MainView.h"
 #include "device.h"
+#include <fstream>
 #include "browser.h"
+
+#ifndef _WIN32
+#include <pwd.h>
+#endif
 
 /* macros */
 #define WINDOW_WIDTH 1600
 #define WINDOW_HEIGHT 1000
+
+const std::string IMAGE_DIR     = ".image";
+const std::string IMAGE_CONFIG  = "image.conf";
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +26,38 @@ int main(int argc, char *argv[])
     struct nk_context ctx;
     struct nk_font *font;
     struct nk_font_atlas atlas;
+
+#ifdef _WIN32
+    std::string config_file = getenv("USERPROFILE");
+    if (config_file.empty()) {
+        config_file = getenv("HOMEDRIVE") + genenv("HOMEPATH");
+    }
+#else
+    std::string config_file = getenv("HOME");
+    if (config_file.empty()) {
+        struct passwd *pw = getpwuid(getuid());
+        if (!pw) {
+            throw std::runtime_error("getpwuid() failed");
+        }
+
+        config_file = pw->pw_dir;
+    }
+
+#endif
+
+    if (config_file.empty()) {
+        //TODO: Home dir is not found, try to run without config somehow
+    } else {
+        config_file = std::filesystem::path(config_file) / IMAGE_DIR;
+        if (!std::filesystem::exists(config_file)) {
+            std::filesystem::create_directory(config_file);
+        }
+
+        config_file = std::filesystem::path(config_file) / IMAGE_CONFIG;
+        if (!std::filesystem::exists(config_file)) {
+            std::ofstream{ config_file };
+        }
+    }
 
     /* GLFW */
     glfwSetErrorCallback(error_callback);
@@ -69,7 +109,7 @@ int main(int argc, char *argv[])
 
     //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
     // but on my device they are the same
-    MainView mainView(&ctx, width, height);
+    MainView mainView("ff", &ctx, width, height);
     glfwSetWindowUserPointer(win, &mainView);
 
     while (!glfwWindowShouldClose(win))

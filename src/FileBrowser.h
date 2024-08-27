@@ -14,6 +14,7 @@
             std::string name;
         };
 
+        FileBrowser() = default;
         FileBrowser(std::string path);
 
         ~FileBrowser() = default;
