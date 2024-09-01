@@ -1,11 +1,6 @@
 #include "FileBrowser.h"
-#include <filesystem>
 #include <algorithm>
 #include <stdexcept>
-
-    FileBrowser::FileBrowser(std::string path) : path(path) {
-        update_path(path); //TODO: update() can crash, I should process it here somehow
-    }
 
     void FileBrowser::update_path(std::string path, bool force_update) {
         namespace fs = std::filesystem;
@@ -93,6 +88,14 @@
         } else {
             return false;
         }
+    }
+
+    std::string FileBrowser::get_path() const {
+        return path;
+    }
+
+    std::string FileBrowser::get_full_path() const {
+        return full_path;
     }
 
     bool FileBrowser::is_dir() const {

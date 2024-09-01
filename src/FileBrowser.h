@@ -1,53 +1,29 @@
 #ifndef __FILEBROWSER__
 #define __FILEBROWSER__
 
-#include <vector>
-#include <string>
+#include "Browser.h"
 #include <filesystem>
 
-    class FileBrowser {
+    class FileBrowser : public Browser {
     public:
 
-        struct FileEntry {
-            bool is_directory;
-            bool is_active;
-            std::string name;
-        };
-
         FileBrowser() = default;
-        FileBrowser(std::string path);
 
-        ~FileBrowser() = default;
+        void update_path(std::string path, bool force_update = false) override; // throw std::runtime_error()
+        void update_file(std::string file, bool force_update = false) override;
 
-        typedef std::vector<FileEntry> Files;
+        bool prev() override;
+        bool next() override;
 
-        void update_path(std::string path, bool force_update = false); // throw std::runtime_error()
-        void update_file(std::string file, bool force_update = false);
+        std::string get_path() const override;
+        std::string get_full_path() const override;
 
-        bool prev();
-        bool next();
-
-        inline std::string get_path() const {
-            return path;
-        }
-
-        inline std::string get_full_path() const {
-            return full_path;
-        }
-
-        inline const Files &get_dir() const {
-            return files;
-        }
-
-        bool is_dir() const;
+        bool is_dir() const override;
 
     protected:
         std::filesystem::path path;
         std::filesystem::path full_path;
-        Files files;
     };
-
-
 
 #endif /* __FILEBROWSER__ */
 
