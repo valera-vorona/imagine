@@ -12,6 +12,9 @@
 #include <fstream>
 #include <stdexcept>
 
+
+#include "FileBrowser.h"
+
 /* config constants */
 const std::string CFG_LATEST_SEEN = "latest_seen";
 
@@ -61,6 +64,7 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         ctx(ctx),
         content_width(content_width),
         content_height(content_height),
+        browser(std::make_unique<FileBrowser>()),
         current_image(new struct nk_image) {
 
         std::ifstream config_stream(config_file); 
@@ -69,9 +73,9 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
         adopt_config();
 
-        file_browser.update_path(config[CFG_LATEST_SEEN].get<std::string>());
+        browser->update_path(config[CFG_LATEST_SEEN].get<std::string>());
 
-        strcpy(path_buffer, file_browser.get_full_path().c_str());
+        strcpy(path_buffer, browser->get_full_path().c_str());
 
         try {
             *current_image = load_image(path_buffer, &current_image_meta);
@@ -127,7 +131,7 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
         if (nk_button_symbol(ctx, NK_SYMBOL_CIRCLE_OUTLINE)) {
             try {
-                file_browser.update_path(path_buffer);
+                browser->update_path(path_buffer);
                 reload_image();
             } catch (std::runtime_error &e) {
                 status = e.what();
@@ -155,7 +159,7 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
             nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
 
-            for (const auto &e : file_browser.get_dir()) {
+            for (const auto &e : browser->get_dir()) {
                 nk_symbol_type symbol = e.is_directory ? NK_SYMBOL_TRIANGLE_RIGHT : NK_SYMBOL_NONE;
                 bool pushed = false;
                 if (e.is_active) {
@@ -166,8 +170,8 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
                 if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
                     try {
-                        file_browser.update_file(e.name);
-                        if (!file_browser.is_dir()) {
+                        browser->update_file(e.name);
+                        if (!browser->is_dir()) {
                             reload_image();
                         }
                     } catch (std::runtime_error &e) {
@@ -222,8 +226,8 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     void MainView::reload_image() {
         try {
             glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
-            *current_image = load_image(file_browser.get_full_path().c_str(), &current_image_meta);
-            strcpy(path_buffer, file_browser.get_full_path().c_str());
+            *current_image = load_image(browser->get_full_path().c_str(), &current_image_meta);
+            strcpy(path_buffer, browser->get_full_path().c_str());
             config[CFG_LATEST_SEEN] = path_buffer;
         } catch (std::runtime_error &e) {
             status = e.what();
@@ -231,13 +235,13 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     }
 
     void MainView::up() {
-        if (file_browser.prev() && !file_browser.is_dir()) {
+        if (browser->prev() && !browser->is_dir()) {
             reload_image();
         }
     }
 
     void MainView::down() {
-        if (file_browser.next() && !file_browser.is_dir()) {
+        if (browser->next() && !browser->is_dir()) {
             reload_image();
         }
     }

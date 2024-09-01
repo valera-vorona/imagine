@@ -1,7 +1,8 @@
 #ifndef __MAINVIEW__
 #define __MAINVIEW__
 
-#include "FileBrowser.h"
+#include "Browser.h"
+#include <memory>
 #include <nlohmann/json.hpp>
 
     struct nk_context;
@@ -46,7 +47,7 @@
         int content_width;
         int content_height;
 
-        FileBrowser file_browser;
+        std::unique_ptr<Browser> browser;
 
         nk_image *current_image;
         struct image_meta current_image_meta;
@@ -54,8 +55,6 @@
         char path_buffer[MAX_PATH_LEN];
         std::string status;
     };
-
-
 
 #endif /* __MAINVIEW__ */
 
