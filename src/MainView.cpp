@@ -64,7 +64,6 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         ctx(ctx),
         content_width(content_width),
         content_height(content_height),
-        browser(std::make_unique<FileBrowser>()),
         current_image(new struct nk_image) {
 
         std::ifstream config_stream(config_file); 
@@ -72,6 +71,9 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         config_stream.close();
 
         adopt_config();
+
+        add_browser(std::move(std::make_unique<FileBrowser>()));
+        browser = browsers.back().get();
 
         browser->update_path(config[CFG_LATEST_SEEN].get<std::string>());
 
@@ -90,6 +92,10 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
         std::ofstream config_stream(config_file, std::ofstream::out | std::ofstream::trunc);
         config_stream << config;
+    }
+
+    void MainView::add_browser(std::unique_ptr<Browser> browser) {
+        browsers.push_back(std::move(browser));
     }
 
     void MainView::set_size(int width, int height) {

@@ -3,6 +3,7 @@
 
 #include "Browser.h"
 #include <memory>
+#include <vector>
 #include <nlohmann/json.hpp>
 
     struct nk_context;
@@ -19,6 +20,8 @@
 
         MainView(std::string config_file, nk_context *ctx, int content_width, int content_height);
         virtual ~MainView();
+
+        void add_browser(std::unique_ptr<Browser> browser);
 
         inline nk_context *get_context() { return ctx; }
         inline int get_width() const { return content_width; }
@@ -47,7 +50,8 @@
         int content_width;
         int content_height;
 
-        std::unique_ptr<Browser> browser;
+        Browser *browser;
+        std::vector<std::unique_ptr<Browser>> browsers;
 
         nk_image *current_image;
         struct image_meta current_image_meta;
