@@ -17,6 +17,8 @@
 
         virtual ~Browser() = default;
 
+        virtual int can_do(std::string path) const = 0;
+
         typedef std::vector<FileEntry> Files;
 
         virtual void update_path(std::string path, bool force_update = false) = 0; // throw std::runtime_error()
@@ -28,7 +30,7 @@
         virtual std::string get_path() const = 0;
         virtual std::string get_full_path() const = 0;
 
-        inline const Files &get_dir() const {
+        inline const Files get_dir() const {
             return files;
         }
 

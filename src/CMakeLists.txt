@@ -12,6 +12,8 @@ set(SOURCE_EXE
     MainView.h
     MainView.cpp
     Browser.h
+    DummyBrowser.h
+    DummyBrowser.cpp
     FileBrowser.h
     FileBrowser.cpp
     browser.cpp

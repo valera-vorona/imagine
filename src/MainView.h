@@ -21,7 +21,7 @@
         MainView(std::string config_file, nk_context *ctx, int content_width, int content_height);
         virtual ~MainView();
 
-        void add_browser(std::unique_ptr<Browser> browser);
+        void add_browser(std::shared_ptr<Browser> browser);
 
         inline nk_context *get_context() { return ctx; }
         inline int get_width() const { return content_width; }
@@ -37,6 +37,8 @@
     protected:
         void reload_image();
 
+        void setup_most_sutable_browser();
+
         void adopt_config();
 
         static const int MAX_PATH_LEN = 4096;
@@ -50,8 +52,8 @@
         int content_width;
         int content_height;
 
-        Browser *browser;
-        std::vector<std::unique_ptr<Browser>> browsers;
+        std::shared_ptr<Browser> browser;
+        std::vector<std::shared_ptr<Browser>> browsers;
 
         nk_image *current_image;
         struct image_meta current_image_meta;

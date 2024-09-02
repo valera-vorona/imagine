@@ -2,6 +2,10 @@
 #include <algorithm>
 #include <stdexcept>
 
+    int FileBrowser::can_do(std::string path) const {
+        return 2;
+    }
+
     void FileBrowser::update_path(std::string path, bool force_update) {
         namespace fs = std::filesystem;
 
@@ -57,7 +61,13 @@
     }
 
     void FileBrowser::update_file(std::string file, bool force_update) {
-        update_path(this->path / file, force_update);
+        if (file == "..") {
+            path = path.parent_path();
+            full_path = path;
+            update_path(path, true);
+        } else {
+            update_path(path / file, force_update);
+        }
     }
 
     bool FileBrowser::prev() {

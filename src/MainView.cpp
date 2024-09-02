@@ -12,8 +12,7 @@
 #include <fstream>
 #include <stdexcept>
 
-
-#include "FileBrowser.h"
+#include "DummyBrowser.h"
 
 /* config constants */
 const std::string CFG_LATEST_SEEN = "latest_seen";
@@ -72,12 +71,13 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
         adopt_config();
 
-        add_browser(std::move(std::make_unique<FileBrowser>()));
-        browser = browsers.back().get();
+        // Adding the dummy browser. Its function can_do() should always return not 0 showing with that that it can do a file when
+        // all the other browsers can't
+        add_browser(std::make_shared<DummyBrowser>());
 
-        browser->update_path(config[CFG_LATEST_SEEN].get<std::string>());
+        strcpy(path_buffer, config[CFG_LATEST_SEEN].get<std::string>().c_str());
 
-        strcpy(path_buffer, browser->get_full_path().c_str());
+        //browser->update_path(path_buffer);
 
         try {
             *current_image = load_image(path_buffer, &current_image_meta);
@@ -94,8 +94,9 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         config_stream << config;
     }
 
-    void MainView::add_browser(std::unique_ptr<Browser> browser) {
-        browsers.push_back(std::move(browser));
+    void MainView::add_browser(std::shared_ptr<Browser> browser) {
+        browsers.push_back(browser);
+        setup_most_sutable_browser();
     }
 
     void MainView::set_size(int width, int height) {
@@ -177,16 +178,19 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
                 if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
                     try {
                         browser->update_file(e.name);
-                        if (!browser->is_dir()) {
-                            reload_image();
+                        if (e.name == "..") {
+                            strcpy(path_buffer, browser->get_full_path().c_str());
                         }
+                        //if (!browser->is_dir()) {
+                            reload_image();
+                        //}
                     } catch (std::runtime_error &e) {
                         status = e.what();
                     }
                 }
 
                 if (!active_gone_through) {
-                    y_offset += LINE_HEIGHT;;
+                    y_offset += LINE_HEIGHT;
                 }
 
                 if (pushed) {
@@ -238,6 +242,18 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         } catch (std::runtime_error &e) {
             status = e.what();
         }
+    }
+
+    void MainView::setup_most_sutable_browser() {
+        int max = 0;
+
+        for (auto b: browsers) {
+            if (b->can_do(path_buffer) > max) {
+                browser = b;
+            }
+        }
+
+        browser->update_path(path_buffer);
     }
 
     void MainView::up() {

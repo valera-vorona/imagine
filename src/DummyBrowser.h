@@ -1,13 +1,12 @@
-#ifndef __FILEBROWSER__
-#define __FILEBROWSER__
+#ifndef __DUMMYBROWSER__
+#define __DUMMYBROWSER__
 
 #include "Browser.h"
-#include <filesystem>
 
-    class FileBrowser : public Browser {
+    class DummyBrowser : public Browser {
     public:
 
-        FileBrowser() = default;
+        DummyBrowser() = default;
 
         int can_do(std::string path) const override;
 
@@ -21,11 +20,7 @@
         std::string get_full_path() const override;
 
         bool is_dir() const override;
-
-    protected:
-        std::filesystem::path path;
-        std::filesystem::path full_path;
     };
 
-#endif /* __FILEBROWSER__ */
+#endif /* __DUMMYBROWSER__ */
 

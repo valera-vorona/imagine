@@ -3,6 +3,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "browser.h"
+#include "FileBrowser.h"
 
 #ifndef _WIN32
 #include <pwd.h>
@@ -130,6 +131,8 @@ int main(int argc, char *argv[])
     // but on my device they are the same
     glfwGetWindowSize(win, &width, &height);
     MainView mainView(config_file, &ctx, width, height);
+    mainView.add_browser(std::make_shared<FileBrowser>());
+
     glfwSetWindowUserPointer(win, &mainView);
 
     while (!glfwWindowShouldClose(win))
