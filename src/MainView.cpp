@@ -3,11 +3,9 @@
 //#define NK_IMPLEMENTATION
 #include "nuklear.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <opencv2/opencv.hpp>
 
 #include <fstream>
 #include <stdexcept>
@@ -19,25 +17,31 @@ const std::string CFG_LATEST_SEEN = "latest_seen";
 
 struct nk_image load_image(const char *filename, struct image_meta *image_meta) // throw std::runtine_error
 {
+    using namespace cv;
+
     int x,y,n;
     GLuint tex;
     GLint ifmt;
     GLenum fmt;
 
-    unsigned char *data = stbi_load(filename, &x, &y, &n, 0);
+    Mat im = imread(filename, IMREAD_UNCHANGED);
 
-    if (!data) {
+    if (im.empty()) {
         throw std::runtime_error(std::string("Can't open image file: '") + filename + "'");
     }
 
+    x = im.size().width;
+    y = im.size().height;
+    n = im.elemSize();
+
     switch (n) {
         case 2: ifmt = GL_RG8; fmt = GL_RG; break;
-        case 3: ifmt = GL_RGB8; fmt = GL_RGB; break;
-        case 4: ifmt = GL_RGBA8; fmt = GL_RGBA; break;
+        case 3: ifmt = GL_RGB8; fmt = GL_BGR; break;
+        case 4: ifmt = GL_RGBA8; fmt = GL_BGRA; break;
         default: ifmt = GL_R8; fmt = GL_R; break;
     }
 
-    // OpenGL default alignment is 4, correct it if necessary
+    // OpenGL default alignment is 4, correct it if necessery
     glPixelStorei(GL_UNPACK_ALIGNMENT, (x * n) % 4 ? 1 : 4);
 
     glGenTextures(1, &tex);
@@ -46,15 +50,15 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, ifmt, x, y, 0, fmt, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, ifmt, x, y, 0, fmt, GL_UNSIGNED_BYTE, im.ptr());
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
 
     if (image_meta) {
         image_meta->w = x;
         image_meta->h = y;
         image_meta->n = n;
     }
+
     return nk_image_id((int)tex);
 }
 

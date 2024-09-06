@@ -2,7 +2,6 @@
 #include "device.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include "browser.h"
 #include "FileBrowser.h"
 
 #ifndef _WIN32
