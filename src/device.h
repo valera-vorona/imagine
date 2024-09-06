@@ -260,44 +260,44 @@ void error_callback(int e, const char *d){
 }
 
 void text_input(GLFWwindow *win, unsigned int codepoint) {
-    nk_input_unicode((struct nk_context*)((MainView *)glfwGetWindowUserPointer(win))->get_context(), codepoint);
+    nk_input_unicode((struct nk_context*)((Model *)glfwGetWindowUserPointer(win))->get_context(), codepoint);
 }
 
 void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
-    MainView *mainView = (MainView *)glfwGetWindowUserPointer(win);
+    Model *model = (Model *)glfwGetWindowUserPointer(win);
 
     if (action == GLFW_PRESS || action == GLFW_REPEAT) {
         switch (key) {
             case GLFW_KEY_DELETE:
-                nk_input_key(mainView->get_context(), NK_KEY_DEL, 1);
+                nk_input_key(model->get_context(), NK_KEY_DEL, 1);
                 break;
 
             case GLFW_KEY_ENTER:
-                nk_input_key(mainView->get_context(), NK_KEY_ENTER, 1);
+                nk_input_key(model->get_context(), NK_KEY_ENTER, 1);
                 break;
 
             case GLFW_KEY_TAB:
-                nk_input_key(mainView->get_context(), NK_KEY_TAB, 1);
+                nk_input_key(model->get_context(), NK_KEY_TAB, 1);
                 break;
 
             case GLFW_KEY_BACKSPACE:
-                nk_input_key(mainView->get_context(), NK_KEY_BACKSPACE, 1);
+                nk_input_key(model->get_context(), NK_KEY_BACKSPACE, 1);
                 break;
 
             case GLFW_KEY_LEFT:
-                nk_input_key(mainView->get_context(), NK_KEY_LEFT, 1);
+                nk_input_key(model->get_context(), NK_KEY_LEFT, 1);
                 break;
 
             case GLFW_KEY_RIGHT:
-                nk_input_key(mainView->get_context(), NK_KEY_RIGHT, 1);
+                nk_input_key(model->get_context(), NK_KEY_RIGHT, 1);
                 break;
 
             case GLFW_KEY_UP:
-                mainView->up();
+                model->up();
                 break;
 
             case GLFW_KEY_DOWN:
-                mainView->down();
+                model->down();
                 break;
         }
     }
@@ -305,6 +305,6 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
 
 void scroll_input(GLFWwindow *win, double _, double yoff) {
     UNUSED(_);
-    nk_input_scroll((struct nk_context*)((MainView *)glfwGetWindowUserPointer(win))->get_context(), nk_vec2(0, (float)yoff));
+    nk_input_scroll((struct nk_context*)((Model *)glfwGetWindowUserPointer(win))->get_context(), nk_vec2(0, (float)yoff));
 }
 

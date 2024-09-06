@@ -1,8 +1,7 @@
-#include "MainView.h"
+#include "Model.h"
 #include "device.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include "browser.h"
 #include "FileBrowser.h"
 
 #ifndef _WIN32
@@ -130,10 +129,10 @@ int main(int argc, char *argv[])
     //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
     // but on my device they are the same
     glfwGetWindowSize(win, &width, &height);
-    MainView mainView(config_file, &ctx, width, height);
-    mainView.add_browser(std::make_shared<FileBrowser>());
+    Model model(config_file, &ctx, width, height);
+    model.add_browser(std::make_shared<FileBrowser>());
 
-    glfwSetWindowUserPointer(win, &mainView);
+    glfwSetWindowUserPointer(win, &model);
 
     while (!glfwWindowShouldClose(win))
     {
@@ -146,7 +145,7 @@ int main(int argc, char *argv[])
 
         //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
         // but on my device they are the same
-        mainView.set_size(width, height);
+        model.set_size(width, height);
 
         /* Input */
         {double x, y;
@@ -175,7 +174,7 @@ int main(int argc, char *argv[])
         nk_input_end(&ctx);}
 
         /* GUI */
-        mainView.draw();
+        model.draw();
 
         /* Draw */
         glViewport(0, 0, display_width, display_height);

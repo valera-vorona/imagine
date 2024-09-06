@@ -9,14 +9,15 @@ find_package(OpenGL REQUIRED)
 
 set(SOURCE_EXE
     main.cpp
-    MainView.h
-    MainView.cpp
+    Model.h
+    Model.cpp
+#    MainView.h
+#    MainView.cpp
     Browser.h
     DummyBrowser.h
     DummyBrowser.cpp
     FileBrowser.h
     FileBrowser.cpp
-    browser.cpp
     device.h
 )
 
