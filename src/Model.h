@@ -7,7 +7,6 @@
 #include <nlohmann/json.hpp>
 
     struct nk_context;
-    struct nk_image;
 
     struct image_meta {
         int id;
@@ -56,7 +55,6 @@
         std::shared_ptr<Browser> browser;
         std::vector<std::shared_ptr<Browser>> browsers;
 
-        nk_image *current_image;
         struct image_meta current_image_meta;
 
         char path_buffer[MAX_PATH_LEN];

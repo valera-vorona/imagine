@@ -17,7 +17,7 @@
 /* config constants */
 const std::string CFG_LATEST_SEEN = "latest_seen";
 
-struct nk_image load_image(const char *filename, struct image_meta *image_meta) // throw std::runtine_error
+int load_image(const char *filename, struct image_meta *image_meta) // throw std::runtine_error
 {
     int x,y,n;
     GLuint tex;
@@ -56,15 +56,19 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         image_meta->h = y;
         image_meta->n = n;
     }
-    return nk_image_id((int)tex);
+
+    return tex;
+}
+
+void free_image(int tex) {
+    glDeleteTextures(1, (const GLuint*)&tex);
 }
 
     Model::Model(std::string config_file, nk_context *ctx, int content_width, int content_height) :
         config_file(config_file),
         ctx(ctx),
         content_width(content_width),
-        content_height(content_height),
-        current_image(new struct nk_image) {
+        content_height(content_height) {
 
         std::ifstream config_stream(config_file); 
         config = nlohmann::json::parse(config_stream);
@@ -81,15 +85,14 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
         //browser->update_path(path_buffer);
 
         try {
-            *current_image = load_image(path_buffer, &current_image_meta);
+            load_image(path_buffer, &current_image_meta);
         } catch (std::runtime_error &e) {
             status = e.what();
         }
     }
 
     Model::~Model() {
-        glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
-        delete current_image;
+        free_image(current_image_meta.id);
 
         std::ofstream config_stream(config_file, std::ofstream::out | std::ofstream::trunc);
         config_stream << config;
@@ -215,10 +218,10 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
             if (ar_image > ar_view) {
                 nk_layout_row_static(ctx, (float)width / ar_image , width, 1);
-                nk_image(ctx, *current_image);
+                nk_image(ctx, nk_image_id(current_image_meta.id));
             } else {
                 nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
-                nk_image(ctx, *current_image);
+                nk_image(ctx, nk_image_id(current_image_meta.id));
             }
 
             status = std::string("w: ") + std::to_string(current_image_meta.w) +
@@ -236,8 +239,8 @@ struct nk_image load_image(const char *filename, struct image_meta *image_meta) 
 
     void Model::reload_image() {
         try {
-            glDeleteTextures(1, (const GLuint*)&current_image->handle.id);
-            *current_image = load_image(browser->get_full_path().c_str(), &current_image_meta);
+            free_image(current_image_meta.id);
+            load_image(browser->get_full_path().c_str(), &current_image_meta);
             strcpy(path_buffer, browser->get_full_path().c_str());
             config[CFG_LATEST_SEEN] = path_buffer;
         } catch (std::runtime_error &e) {
