@@ -23,7 +23,6 @@
     void MainView::draw(int content_width, int content_height, struct image_meta *image) {
         static const int LINE_HEIGHT = 24;
 
-        std::string status;
         auto ctx = model->get_context();
         auto browser = model->get_browser();
 
@@ -51,7 +50,7 @@
                 browser->update_path(path_buffer);
                 model->reload_image();
             } catch (std::runtime_error &e) {
-                status = e.what();
+                model->set_status(e.what());
             }
         }
 
@@ -95,7 +94,7 @@
                             model->reload_image();
                         //}
                     } catch (std::runtime_error &e) {
-                        status = e.what();
+                        model->set_status(e.what());
                     }
                 }
 
@@ -132,15 +131,16 @@
                 nk_image(ctx, nk_image_id(image->id));
             }
 
-            status = std::string("w: ") + std::to_string(image->w) +
+            model->set_status( std::string("w: ") + std::to_string(image->w) +
                 std::string(", h: ") + std::to_string(image->h) +
-                std::string(", n: ") + std::to_string(image->n);
+                std::string(", n: ") + std::to_string(image->n) );
+
             nk_group_end(ctx);
         }
 
         // Status bar
         nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
-          nk_label(ctx, status.c_str(),  NK_TEXT_LEFT);
+          nk_label(ctx, model->get_status().c_str(),  NK_TEXT_LEFT);
 
         nk_end(ctx);
     }
