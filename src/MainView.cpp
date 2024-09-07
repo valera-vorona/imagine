@@ -1,17 +1,15 @@
 #include "MainView.h"
+#include "Model.h"
 
 //#define NK_IMPLEMENTATION
 #include "nuklear.h"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include <fstream>
 #include <stdexcept>
 
-
-    MainView::MainView(nk_context *ctx, const char *path) : ctx(ctx) {
-        strcpy(path_buffer, path);
+    MainView::MainView(Model *model, char *path) : model(model), path_buffer(path) {
+        if (!model) {
+          throw std::runtime_error("Error creating MainView, Model class pointer not provided");
+        }
     }
 
     /* layout
@@ -22,14 +20,16 @@
      * FIle list w=300 | Image w=* (h=*)
      * Status bar       (h=24)
     */
-    void MainView::draw(int content_width, int content_height, nk_image image) {
+    void MainView::draw(int content_width, int content_height, struct image_meta *image) {
         static const int LINE_HEIGHT = 24;
 
-        status.clear();
+        std::string status;
+        auto ctx = model->get_context();
+        auto browser = model->get_browser();
 
         if (!nk_begin(ctx, "MainView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {
           nk_end(ctx);
-          throw std::runtime_error("Error creating MainView");
+          throw std::runtime_error("Error beginning MainView");
         }
 
         // Menu
@@ -49,7 +49,7 @@
         if (nk_button_symbol(ctx, NK_SYMBOL_CIRCLE_OUTLINE)) {
             try {
                 browser->update_path(path_buffer);
-                reload_image();
+                model->reload_image();
             } catch (std::runtime_error &e) {
                 status = e.what();
             }
@@ -92,7 +92,7 @@
                             strcpy(path_buffer, browser->get_full_path().c_str());
                         }
                         //if (!browser->is_dir()) {
-                            reload_image();
+                            model->reload_image();
                         //}
                     } catch (std::runtime_error &e) {
                         status = e.what();
@@ -119,20 +119,22 @@
             height -= 20; // deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
 
             // calculating aspect ratios of the image and the view
-            const float ar_image = (float)current_image_meta.w / (float)current_image_meta.h;
+            const float ar_image = (float)image->w / (float)image->h;
             const float ar_view  = (float)width / (float)height;
 
             if (ar_image > ar_view) {
                 nk_layout_row_static(ctx, (float)width / ar_image , width, 1);
-                nk_image(ctx, *current_image);
+                //TODO: I create nk_image here every frame, maybe I should prepare it outside this function and send it as an argument
+                nk_image(ctx, nk_image_id(image->id));
             } else {
                 nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
-                nk_image(ctx, *current_image);
+                //TODO: the same as above
+                nk_image(ctx, nk_image_id(image->id));
             }
 
-            status = std::string("w: ") + std::to_string(current_image_meta.w) +
-                std::string(", h: ") + std::to_string(current_image_meta.h) +
-                std::string(", n: ") + std::to_string(current_image_meta.n);
+            status = std::string("w: ") + std::to_string(image->w) +
+                std::string(", h: ") + std::to_string(image->h) +
+                std::string(", n: ") + std::to_string(image->n);
             nk_group_end(ctx);
         }
 

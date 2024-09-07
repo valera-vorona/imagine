@@ -1,28 +1,22 @@
 #ifndef __MAINVIEW__
 #define __MAINVIEW__
 
-#include "Browser.h"
-#include <memory>
-#include <vector>
-#include <nlohmann/json.hpp>
+    struct image_meta;
+    class Model;
 
     class MainView {
     public:
 
-        MainView(nk_context *ctx, const char *path);
+        MainView(Model *model, char *path); // throw std::runtime_error
         virtual ~MainView() = default;
 
-        void draw(int contect_width, int content_height); // throw std::runtime_error
+        void draw(int content_width, int content_height, struct image_meta *image); // throw std::runtime_error
 
     protected:
+        static const int MAX_PATH_LEN = 4096;
 
-        nk_context *ctx;
-
-        nk_image *current_image;
-        struct image_meta current_image_meta;
-
-        char path_buffer[MAX_PATH_LEN];
-        std::string status;
+        Model *model;
+        char *path_buffer;
     };
 
 #endif /* __MAINVIEW__ */
