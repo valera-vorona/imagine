@@ -6,6 +6,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/")
 find_package(GLFW3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 set(SOURCE_EXE
     main.cpp
