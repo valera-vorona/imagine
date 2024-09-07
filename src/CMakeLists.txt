@@ -13,6 +13,8 @@ set(SOURCE_EXE
     main.cpp
     Model.h
     Model.cpp
+    View.h
+    View.cpp
     MainView.h
     MainView.cpp
     Browser.h

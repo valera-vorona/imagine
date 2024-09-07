@@ -152,6 +152,10 @@ void free_image(int tex) {
         }
     }
 
+    void Model::toggle_view() {
+
+    }
+
     void Model::adopt_config() {
         if (!config[CFG_LATEST_SEEN].is_string()) {
              config[CFG_LATEST_SEEN] = "/"; //TODO: I should use a more smart way here to find the home dir like it is done in the main function

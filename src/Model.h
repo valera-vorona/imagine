@@ -38,6 +38,8 @@
         void up();
         void down();
 
+        void toggle_view();
+
         void reload_image();
 
     protected:

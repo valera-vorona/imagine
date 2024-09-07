@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 
-    MainView::MainView(Model *model, const char *path) : model(model) {
+    MainView::MainView(Model *model, const char *path) : View(model, path) {
         if (!model) {
           throw std::runtime_error("Error creating MainView, Model class pointer not provided");
         }
@@ -57,8 +57,11 @@
         }
 
         // Image menu line
-        nk_layout_row_dynamic(ctx, LINE_HEIGHT * 2, 1);
-          nk_label(ctx, "Image menu under construction", NK_TEXT_LEFT);
+        nk_layout_row_static(ctx, LINE_HEIGHT * 2, LINE_HEIGHT * 2, 1);
+            if (nk_button_symbol(ctx, NK_SYMBOL_PLUS)) {
+                model->toggle_view();
+            }
+          //nk_label(ctx, "Image menu under construction", NK_TEXT_LEFT);
 
         // Main part
         // Width is the whole window width - width of file list
@@ -143,15 +146,5 @@
           nk_label(ctx, model->get_status().c_str(),  NK_TEXT_LEFT);
 
         nk_end(ctx);
-    }
-
-    void MainView::set_full_path(const char *path) {
-        if (strlen(path) > MAX_PATH_LEN - 1) {
-            memcpy(path_buffer, path, MAX_PATH_LEN - 1);
-            path_buffer[MAX_PATH_LEN - 1] = '\0';
-            throw std::runtime_error("Path too long");
-        } else {
-            strcpy(path_buffer, path);
-        }
     }
 
