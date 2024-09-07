@@ -6,6 +6,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/")
 find_package(GLFW3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(OpenCV REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 set(SOURCE_EXE
@@ -24,9 +25,10 @@ set(SOURCE_EXE
 
 add_executable(${PROJECT_NAME} ${SOURCE_EXE})
 
-#target_include_directories(${PROJECT_NAME})# PRIVATE ${GLFW3_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW3_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${OpenCV_INCLUDE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${GLFW3_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${nlohmann_json_LIBRARY})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${GLFW3_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${OpenCV_LIBRARIES} ${nlohmann_json_LIBRARY})
 
 #target_include_directories(${PROJECT_NAME}
 #    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
