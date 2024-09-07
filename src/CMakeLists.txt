@@ -17,6 +17,8 @@ set(SOURCE_EXE
     View.cpp
     MainView.h
     MainView.cpp
+    FullScreenView.h
+    FullScreenView.cpp
     Browser.h
     DummyBrowser.h
     DummyBrowser.cpp
