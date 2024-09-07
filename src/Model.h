@@ -45,8 +45,6 @@
 
         void adopt_config();
 
-        static const int MAX_PATH_LEN = 4096;
-
         std::string config_file;
 
         nlohmann::json config;
@@ -63,8 +61,7 @@
 
         struct image_meta current_image_meta;
 
-        //TODO: this char path_buffer[] should be in MainView class, here we can use std::string instead 
-        char path_buffer[MAX_PATH_LEN];
+        std::string path;
         std::string status;
     };
 

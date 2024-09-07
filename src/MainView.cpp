@@ -6,10 +6,12 @@
 
 #include <stdexcept>
 
-    MainView::MainView(Model *model, char *path) : model(model), path_buffer(path) {
+    MainView::MainView(Model *model, const char *path) : model(model) {
         if (!model) {
           throw std::runtime_error("Error creating MainView, Model class pointer not provided");
         }
+
+        set_full_path(path);
     }
 
     /* layout
@@ -87,9 +89,7 @@
                 if (nk_button_symbol_label(ctx, symbol, e.name.c_str(), NK_TEXT_RIGHT)) {
                     try {
                         browser->update_file(e.name);
-                        if (e.name == "..") {
-                            strcpy(path_buffer, browser->get_full_path().c_str());
-                        }
+                        set_full_path(browser->get_full_path().c_str());
                         //if (!browser->is_dir()) {
                             model->reload_image();
                         //}
@@ -143,5 +143,15 @@
           nk_label(ctx, model->get_status().c_str(),  NK_TEXT_LEFT);
 
         nk_end(ctx);
+    }
+
+    void MainView::set_full_path(const char *path) {
+        if (strlen(path) > MAX_PATH_LEN - 1) {
+            memcpy(path_buffer, path, MAX_PATH_LEN - 1);
+            path_buffer[MAX_PATH_LEN - 1] = '\0';
+            throw std::runtime_error("Path too long");
+        } else {
+            strcpy(path_buffer, path);
+        }
     }
 

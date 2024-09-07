@@ -16,14 +16,14 @@
 /* config constants */
 const std::string CFG_LATEST_SEEN = "latest_seen";
 
-int load_image(const char *filename, struct image_meta *image_meta) // throw std::runtine_error
+int load_image(std::string filename, struct image_meta *image_meta) // throw std::runtine_error
 {
     int x,y,n;
     GLuint tex;
     GLint ifmt;
     GLenum fmt;
 
-    unsigned char *data = stbi_load(filename, &x, &y, &n, 0);
+    unsigned char *data = stbi_load(filename.c_str(), &x, &y, &n, 0);
 
     if (!data) {
         throw std::runtime_error(std::string("Can't open image file: '") + filename + "'");
@@ -79,14 +79,14 @@ void free_image(int tex) {
         // all the other browsers can't
         add_browser(std::make_shared<DummyBrowser>());
 
-        strcpy(path_buffer, config[CFG_LATEST_SEEN].get<std::string>().c_str());
+        path = config[CFG_LATEST_SEEN].get<std::string>();
 
         //browser->update_path(path_buffer);
 
-        drawer = std::make_shared<MainView>(this, path_buffer);
+        drawer = std::make_shared<MainView>(this, path.c_str());
 
         try {
-            load_image(path_buffer, &current_image_meta);
+            load_image(path, &current_image_meta);
         } catch (std::runtime_error &e) {
             status = e.what();
         }
@@ -116,9 +116,10 @@ void free_image(int tex) {
     void Model::reload_image() {
         try {
             free_image(current_image_meta.id);
-            load_image(browser->get_full_path().c_str(), &current_image_meta);
-            strcpy(path_buffer, browser->get_full_path().c_str());
-            config[CFG_LATEST_SEEN] = path_buffer;
+            path = browser->get_full_path();
+            drawer->set_full_path(path.c_str());
+            config[CFG_LATEST_SEEN] = path;
+            load_image(path, &current_image_meta);
         } catch (std::runtime_error &e) {
             status = e.what();
         }
@@ -128,22 +129,22 @@ void free_image(int tex) {
         int max = 0;
 
         for (auto b: browsers) {
-            if (b->can_do(path_buffer) > max) {
+            if (b->can_do(path) > max) {
                 browser = b;
             }
         }
 
-        browser->update_path(path_buffer);
+        browser->update_path(path);
     }
 
     void Model::up() {
-        if (browser->prev() && !browser->is_dir()) {
+        if (browser->prev()) {
             reload_image();
         }
     }
 
     void Model::down() {
-        if (browser->next() && !browser->is_dir()) {
+        if (browser->next()) {
             reload_image();
         }
     }
