@@ -8,11 +8,15 @@
 #include <stdexcept>
 
 #include "MainView.h"
+#include "FullScreenView.h"
 
 #include "DummyBrowser.h"
 
 /* config constants */
-const std::string CFG_LATEST_SEEN = "latest_seen";
+const std::string CFG_LATEST_SEEN           = "latest_seen";
+const std::string CFG_VIEW_MODE             = "view_mode";
+const std::string CFG_VIEW_MODE_NORMAL      = "normal";
+const std::string CFG_VIEW_MODE_FULLSCREEN  = "fullscreen";
 
 int load_image(std::string filename, struct image_meta *image_meta) // throw std::runtine_error
 {
@@ -66,8 +70,9 @@ void free_image(int tex) {
     glDeleteTextures(1, (const GLuint*)&tex);
 }
 
-    Model::Model(std::string config_file, nk_context *ctx, int content_width, int content_height) :
+    Model::Model(std::string config_file, GLFWwindow *window, nk_context *ctx, int content_width, int content_height) :
         config_file(config_file),
+        window(window),
         ctx(ctx),
         content_width(content_width),
         content_height(content_height) {
@@ -84,9 +89,10 @@ void free_image(int tex) {
 
         path = config[CFG_LATEST_SEEN].get<std::string>();
 
-        //browser->update_path(path_buffer);
+        views[CFG_VIEW_MODE_NORMAL]     = std::make_shared<MainView>(this, path.c_str());
+        views[CFG_VIEW_MODE_FULLSCREEN] = std::make_shared<FullScreenView>(this, path.c_str());
 
-        drawer = std::make_shared<MainView>(this, path.c_str());
+        set_view_mode(config[CFG_VIEW_MODE].get<std::string>());
 
         try {
             load_image(path, &current_image_meta);
@@ -113,14 +119,14 @@ void free_image(int tex) {
     }
 
     void Model::draw() {
-        drawer->draw(content_width, content_height, &current_image_meta);
+        view->draw(content_width, content_height, &current_image_meta);
     }
 
     void Model::reload_image() {
         try {
             free_image(current_image_meta.id);
             path = browser->get_full_path();
-            drawer->set_full_path(path.c_str());
+            view->set_full_path(path.c_str());
             config[CFG_LATEST_SEEN] = path;
             load_image(path, &current_image_meta);
         } catch (std::runtime_error &e) {
@@ -152,13 +158,41 @@ void free_image(int tex) {
         }
     }
 
-    void Model::toggle_view() {
+    void Model::toggle_view_mode() {
+        if (config[CFG_VIEW_MODE] == CFG_VIEW_MODE_FULLSCREEN) {
+            set_view_mode(CFG_VIEW_MODE_NORMAL);
+        } else {
+            set_view_mode(CFG_VIEW_MODE_FULLSCREEN);
+        }
+    }
 
+    void Model::set_view_mode(std::string mode) {
+        auto monitor = glfwGetPrimaryMonitor();
+        auto vmode = glfwGetVideoMode(monitor);
+
+        if (mode == CFG_VIEW_MODE_FULLSCREEN) {
+            if (glfwGetWindowMonitor(window) == nullptr) {
+                glfwSetWindowMonitor(window, monitor, 0, 0, vmode->width, vmode->height, vmode->refreshRate);
+            }
+            view = views[CFG_VIEW_MODE_FULLSCREEN];
+            config[CFG_VIEW_MODE] = CFG_VIEW_MODE_FULLSCREEN;
+        } else {
+            if (glfwGetWindowMonitor(window)) {
+                glfwSetWindowMonitor(window, nullptr, 0, 0, content_width - 20, content_height - 20, vmode->refreshRate);
+                //TODO: case 1: deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
+            }
+            view = views[CFG_VIEW_MODE_NORMAL];
+            config[CFG_VIEW_MODE] = CFG_VIEW_MODE_NORMAL;
+        }
     }
 
     void Model::adopt_config() {
         if (!config[CFG_LATEST_SEEN].is_string()) {
              config[CFG_LATEST_SEEN] = "/"; //TODO: I should use a more smart way here to find the home dir like it is done in the main function
+        }
+
+        if (!config[CFG_VIEW_MODE].is_string()) {
+             config[CFG_VIEW_MODE] = CFG_VIEW_MODE_NORMAL;
         }
     }
 

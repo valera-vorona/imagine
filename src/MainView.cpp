@@ -55,9 +55,8 @@
         // Image menu line
         nk_layout_row_static(ctx, LINE_HEIGHT * 2, LINE_HEIGHT * 2, 1);
             if (nk_button_symbol(ctx, NK_SYMBOL_PLUS)) {
-                model->toggle_view();
+                model->toggle_view_mode();
             }
-          //nk_label(ctx, "Image menu under construction", NK_TEXT_LEFT);
 
         // Main part
         // Width is the whole window width - width of file list
@@ -114,7 +113,7 @@
         // Image
         if (nk_group_begin(ctx, "Image", NK_WINDOW_BORDER)) {
             width -= 20;
-            height -= 20; // deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
+            height -= 20; // TODO: case 1: deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
 
             // calculating aspect ratios of the image and the view
             const float ar_image = (float)image->w / (float)image->h;

@@ -299,6 +299,10 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
             case GLFW_KEY_DOWN:
                 model->down();
                 break;
+
+            case GLFW_KEY_F:
+                model->toggle_view_mode();
+                break;
         }
     }
 }

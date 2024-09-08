@@ -4,10 +4,12 @@
 #include "Browser.h"
 #include <memory>
 #include <vector>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
 
+    struct GLFWwindow;
     struct nk_context;
-    class MainView;
+    class View;
 
     struct image_meta {
         int id;
@@ -19,7 +21,7 @@
     class Model {
     public:
 
-        Model(std::string config_file, nk_context *ctx, int content_width, int content_height);
+        Model(std::string config_file, GLFWwindow *window, nk_context *ctx, int content_width, int content_height);
         ~Model();
 
         void add_browser(std::shared_ptr<Browser> browser);
@@ -38,7 +40,7 @@
         void up();
         void down();
 
-        void toggle_view();
+        void toggle_view_mode();
 
         void reload_image();
 
@@ -47,16 +49,21 @@
 
         void adopt_config();
 
+        void set_view_mode(std::string mode);
+
         std::string config_file;
 
         nlohmann::json config;
+
+        GLFWwindow *window;
 
         nk_context *ctx;
 
         int content_width;
         int content_height;
 
-        std::shared_ptr<MainView> drawer;
+        std::shared_ptr<View> view;
+        std::unordered_map<std::string, std::shared_ptr<View>> views;
 
         std::shared_ptr<Browser> browser;
         std::vector<std::shared_ptr<Browser>> browsers;

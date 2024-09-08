@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     //TODO: I'm not sure if I shell provide here width/height, or display_width/display_height
     // but on my device they are the same
     glfwGetWindowSize(win, &width, &height);
-    Model model(config_file, &ctx, width, height);
+    Model model(config_file, win, &ctx, width, height);
     model.add_browser(std::make_shared<FileBrowser>());
 
     glfwSetWindowUserPointer(win, &model);
