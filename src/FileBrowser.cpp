@@ -28,13 +28,14 @@
         auto filename = in_full_path.filename();
 
         if (force_update || this->path != in_path) {
-            this->full_path = in_full_path;
-            this->path = in_path;
-
             files.clear();
 
             files.push_back({true, false, ".."});
 
+            this->full_path = in_full_path;
+            this->path = in_path;
+
+            bool active_exists = false;
             for (const auto &entry : fs::directory_iterator(this->path, fs::directory_options::follow_directory_symlink)) {
                 auto current = entry.path().filename().string();
                 files.push_back({
@@ -42,6 +43,14 @@
                     filename == current ? true : false,
                     current
                 });
+
+                if (filename == current) {
+                    active_exists = true;
+                }
+            }
+
+            if (!active_exists) {
+                files.front().is_active = true;
             }
 
             std::ranges::sort(files, [](const FileBrowser::FileEntry &a, const FileBrowser::FileEntry &b) {
