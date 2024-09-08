@@ -15,8 +15,8 @@ set(SOURCE_EXE
     Model.cpp
     View.h
     View.cpp
-    MainView.h
-    MainView.cpp
+    NormalView.h
+    NormalView.cpp
     FullScreenView.h
     FullScreenView.cpp
     Browser.h

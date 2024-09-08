@@ -7,7 +7,7 @@
 #include <fstream>
 #include <stdexcept>
 
-#include "MainView.h"
+#include "NormalView.h"
 #include "FullScreenView.h"
 
 #include "DummyBrowser.h"
@@ -89,7 +89,7 @@ void free_image(int tex) {
 
         path = config[CFG_LATEST_SEEN].get<std::string>();
 
-        views[CFG_VIEW_MODE_NORMAL]     = std::make_shared<MainView>(this, path.c_str());
+        views[CFG_VIEW_MODE_NORMAL]     = std::make_shared<NormalView>(this, path.c_str());
         views[CFG_VIEW_MODE_FULLSCREEN] = std::make_shared<FullScreenView>(this, path.c_str());
 
         set_view_mode(config[CFG_VIEW_MODE].get<std::string>());

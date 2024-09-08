@@ -1,4 +1,4 @@
-#include "MainView.h"
+#include "NormalView.h"
 #include "Model.h"
 
 //#define NK_IMPLEMENTATION
@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 
-    MainView::MainView(Model *model, const char *path) : View(model, path) {
+    NormalView::NormalView(Model *model, const char *path) : View(model, path) {
 
     }
 
@@ -18,15 +18,15 @@
      * FIle list w=300 | Image w=* (h=*)
      * Status bar       (h=24)
     */
-    void MainView::draw(int content_width, int content_height, struct image_meta *image) {
+    void NormalView::draw(int content_width, int content_height, struct image_meta *image) {
         static const int LINE_HEIGHT = 24;
 
         auto ctx = model->get_context();
         auto browser = model->get_browser();
 
-        if (!nk_begin(ctx, "MainView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {
+        if (!nk_begin(ctx, "NormalView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {
           nk_end(ctx);
-          throw std::runtime_error("Error beginning MainView");
+          throw std::runtime_error("Error beginning NormalView");
         }
 
         // Menu

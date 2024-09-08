@@ -1,15 +1,15 @@
-#ifndef __MAINVIEW__
-#define __MAINVIEW__
+#ifndef __NORMALVIEW__
+#define __NORMALVIEW__
 
 #include "View.h"
 
-    class MainView : public View {
+    class NormalView : public View {
     public:
 
-        MainView(Model *model, const char *path);
+        NormalView(Model *model, const char *path);
 
         void draw(int content_width, int content_height, struct image_meta *image) override; // throw std::runtime_error
     };
 
-#endif /* __MAINVIEW__ */
+#endif /* __NORMALVIEW__ */
 
