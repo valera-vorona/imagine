@@ -18,20 +18,13 @@ const std::string CFG_VIEW_MODE             = "view_mode";
 const std::string CFG_VIEW_MODE_NORMAL      = "normal";
 const std::string CFG_VIEW_MODE_FULLSCREEN  = "fullscreen";
 
-int load_image(std::string filename, struct image_meta *image_meta) // throw std::runtine_error
-{
+int mat_to_tex(const cv::Mat &im, image_meta *image_meta) {
     using namespace cv;
 
     int x,y,n;
     GLuint tex;
     GLint ifmt;
     GLenum fmt;
-
-    Mat im = imread(filename, IMREAD_UNCHANGED);
-
-    if (im.empty()) {
-        throw std::runtime_error(std::string("Can't open image file: '") + filename + "'");
-    }
 
     x = im.size().width;
     y = im.size().height;
@@ -66,6 +59,49 @@ int load_image(std::string filename, struct image_meta *image_meta) // throw std
     return tex;
 }
 
+int load_image(std::string filename, struct image_meta *image_meta) // throw std::runtime_error
+{
+    using namespace cv;
+
+    auto im = imread(filename, IMREAD_UNCHANGED);
+
+    if (im.empty()) {
+        throw std::runtime_error(std::string("Can't open image file: '") + filename + "'");
+    }
+
+    return mat_to_tex(im, image_meta);
+}
+
+int load_video(std::string filename, struct image_meta *image_meta) // throw std::runtine_error
+{
+    using namespace cv;
+
+    auto vc = VideoCapture(filename);
+
+    if (!vc.isOpened()) {
+        throw std::runtime_error(std::string("Can't open video file: '") + filename + "'");
+    }
+
+    Mat im;
+
+    vc >> im;
+
+    return mat_to_tex(im, image_meta);
+}
+
+int load_anything(std::string filename, struct image_meta *image_meta) // throw std::runtine_error
+{
+    try {
+        return load_image(filename, image_meta);
+    } catch (std::runtime_error) {
+        try {
+            return load_video(filename, image_meta);
+        } catch (std::runtime_error) {
+            throw std::runtime_error(std::string("Can't open file: '") + filename + "'");
+        }
+    }
+}
+
 void free_image(int tex) {
     glDeleteTextures(1, (const GLuint*)&tex);
 }
@@ -95,7 +131,7 @@ void free_image(int tex) {
         set_view_mode(config[CFG_VIEW_MODE].get<std::string>());
 
         try {
-            load_image(path, &current_image_meta);
+            load_anything(path, &current_image_meta);
         } catch (std::runtime_error &e) {
             status = e.what();
         }
@@ -128,7 +164,7 @@ void free_image(int tex) {
             path = browser->get_full_path();
             view->set_full_path(path.c_str());
             config[CFG_LATEST_SEEN] = path;
-            load_image(path, &current_image_meta);
+            load_anything(path, &current_image_meta);
         } catch (std::runtime_error &e) {
             status = e.what();
         }
