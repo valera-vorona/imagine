@@ -316,6 +316,28 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
     }
 }
 
+void cursor_position_input(GLFWwindow* win, double xpos, double ypos) {
+    auto ctx = ((Model *)glfwGetWindowUserPointer(win))->get_context();
+
+    nk_input_begin(ctx);
+    nk_input_motion(ctx, (int)xpos, (int)ypos);
+    nk_input_end(ctx);
+}
+
+void mouse_button_input(GLFWwindow* win, int button, int action, int mods) {
+    auto ctx = ((Model *)glfwGetWindowUserPointer(win))->get_context();
+    double x;
+    double y;
+
+    glfwGetCursorPos(win, &x, &y);
+
+    nk_input_begin(ctx);
+    nk_input_button(ctx, NK_BUTTON_LEFT, (int)x, (int)y, button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS);
+    nk_input_button(ctx, NK_BUTTON_MIDDLE, (int)x, (int)y, button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS);
+    nk_input_button(ctx, NK_BUTTON_RIGHT, (int)x, (int)y, button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS);
+    nk_input_end(ctx);
+}
+
 void scroll_input(GLFWwindow *win, double _, double yoff) {
     auto ctx = ((Model *)glfwGetWindowUserPointer(win))->get_context();
 

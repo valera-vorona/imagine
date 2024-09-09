@@ -94,7 +94,10 @@ int main(int argc, char *argv[])
     glfwMakeContextCurrent(win);
     glfwSetCharCallback(win, text_input);
     glfwSetKeyCallback(win, key_input);
+    glfwSetCursorPosCallback(win, cursor_position_input);
+    glfwSetMouseButtonCallback(win, mouse_button_input);
     glfwSetScrollCallback(win, scroll_input);
+
 
     /* OpenGL */
     glViewport(0, 0, width, height);
@@ -166,11 +169,6 @@ int main(int argc, char *argv[])
             nk_input_key(&ctx, NK_KEY_SHIFT, 0);
         }
 
-        glfwGetCursorPos(win, &x, &y);
-        nk_input_motion(&ctx, (int)x, (int)y);
-        nk_input_button(&ctx, NK_BUTTON_LEFT, (int)x, (int)y, glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
-        nk_input_button(&ctx, NK_BUTTON_MIDDLE, (int)x, (int)y, glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS);
-        nk_input_button(&ctx, NK_BUTTON_RIGHT, (int)x, (int)y, glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
         nk_input_end(&ctx);}
 
         /* GUI */
