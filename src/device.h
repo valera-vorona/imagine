@@ -299,6 +299,19 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
                 nk_input_key(ctx, NK_KEY_RIGHT, 1);
                 break;
 
+            case GLFW_KEY_C:
+                if (mods & GLFW_MOD_CONTROL) {
+                    nk_input_key(ctx, NK_KEY_COPY, 1);
+                    glfwSetClipboardString(nullptr, model->get_path().c_str()); 
+                }
+                break;
+
+            case GLFW_KEY_V:
+                if (mods & GLFW_MOD_CONTROL) {
+                    nk_input_key(ctx, NK_KEY_PASTE, 1);
+                }
+                break;
+
             case GLFW_KEY_UP:
                 model->up();
                 break;

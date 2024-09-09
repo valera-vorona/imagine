@@ -150,26 +150,7 @@ int main(int argc, char *argv[])
         // but on my device they are the same
         model.set_size(width, height);
 
-        /* Input */
-        {double x, y;
-        nk_input_begin(&ctx);
         glfwWaitEvents();
-
-        if (glfwGetKey(win, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
-            glfwGetKey(win, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
-            nk_input_key(&ctx, NK_KEY_COPY, glfwGetKey(win, GLFW_KEY_C) == GLFW_PRESS);
-            nk_input_key(&ctx, NK_KEY_PASTE, glfwGetKey(win, GLFW_KEY_P) == GLFW_PRESS);
-            nk_input_key(&ctx, NK_KEY_CUT, glfwGetKey(win, GLFW_KEY_X) == GLFW_PRESS);
-            nk_input_key(&ctx, NK_KEY_CUT, glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS);
-            nk_input_key(&ctx, NK_KEY_SHIFT, 1);
-        } else {
-            nk_input_key(&ctx, NK_KEY_COPY, 0);
-            nk_input_key(&ctx, NK_KEY_PASTE, 0);
-            nk_input_key(&ctx, NK_KEY_CUT, 0);
-            nk_input_key(&ctx, NK_KEY_SHIFT, 0);
-        }
-
-        nk_input_end(&ctx);}
 
         /* GUI */
         model.draw();

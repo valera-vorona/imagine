@@ -29,6 +29,7 @@
         inline nk_context *get_context() { return ctx; }
         inline int get_width() const { return content_width; }
         inline int get_height() const { return content_height; }
+        inline std::string get_path() const { return path; }
         inline std::string get_status() const { return status; }
         inline void set_status(std::string new_status) { status = new_status; }
         inline std::shared_ptr<Browser> get_browser()  { return browser; }
