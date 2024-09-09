@@ -260,36 +260,43 @@ void error_callback(int e, const char *d){
 }
 
 void text_input(GLFWwindow *win, unsigned int codepoint) {
-    nk_input_unicode((struct nk_context*)((Model *)glfwGetWindowUserPointer(win))->get_context(), codepoint);
+    auto ctx = ((Model *)glfwGetWindowUserPointer(win))->get_context();
+
+    nk_input_begin(ctx);
+    nk_input_unicode(ctx, codepoint);
+    nk_input_end(ctx);
 }
 
 void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
     Model *model = (Model *)glfwGetWindowUserPointer(win);
+    auto ctx = model->get_context();
 
     if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+        nk_input_begin(ctx);
+
         switch (key) {
             case GLFW_KEY_DELETE:
-                nk_input_key(model->get_context(), NK_KEY_DEL, 1);
+                nk_input_key(ctx, NK_KEY_DEL, 1);
                 break;
 
             case GLFW_KEY_ENTER:
-                nk_input_key(model->get_context(), NK_KEY_ENTER, 1);
+                nk_input_key(ctx, NK_KEY_ENTER, 1);
                 break;
 
             case GLFW_KEY_TAB:
-                nk_input_key(model->get_context(), NK_KEY_TAB, 1);
+                nk_input_key(ctx, NK_KEY_TAB, 1);
                 break;
 
             case GLFW_KEY_BACKSPACE:
-                nk_input_key(model->get_context(), NK_KEY_BACKSPACE, 1);
+                nk_input_key(ctx, NK_KEY_BACKSPACE, 1);
                 break;
 
             case GLFW_KEY_LEFT:
-                nk_input_key(model->get_context(), NK_KEY_LEFT, 1);
+                nk_input_key(ctx, NK_KEY_LEFT, 1);
                 break;
 
             case GLFW_KEY_RIGHT:
-                nk_input_key(model->get_context(), NK_KEY_RIGHT, 1);
+                nk_input_key(ctx, NK_KEY_RIGHT, 1);
                 break;
 
             case GLFW_KEY_UP:
@@ -304,11 +311,17 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
                 model->toggle_view_mode();
                 break;
         }
+
+        nk_input_end(ctx);
     }
 }
 
 void scroll_input(GLFWwindow *win, double _, double yoff) {
+    auto ctx = ((Model *)glfwGetWindowUserPointer(win))->get_context();
+
+    nk_input_begin(ctx);
     UNUSED(_);
-    nk_input_scroll((struct nk_context*)((Model *)glfwGetWindowUserPointer(win))->get_context(), nk_vec2(0, (float)yoff));
+    nk_input_scroll(ctx, nk_vec2(0, (float)yoff));
+    nk_input_end(ctx);
 }
 
