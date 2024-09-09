@@ -9,8 +9,8 @@
 
 #include "NormalView.h"
 #include "FullScreenView.h"
-
 #include "DummyBrowser.h"
+#include "misc.h"
 
 /* config constants */
 const std::string CFG_LATEST_SEEN           = "latest_seen";
@@ -228,7 +228,7 @@ void free_image(int tex) {
 
     void Model::adopt_config() {
         if (!config[CFG_LATEST_SEEN].is_string()) {
-             config[CFG_LATEST_SEEN] = "/"; //TODO: I should use a more smart way here to find the home dir like it is done in the main function
+             config[CFG_LATEST_SEEN] = get_home_dir();
         }
 
         if (!config[CFG_VIEW_MODE].is_string()) {

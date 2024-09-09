@@ -11,6 +11,8 @@ find_package(nlohmann_json REQUIRED)
 
 set(SOURCE_EXE
     main.cpp
+    misc.h
+    misc.cpp
     Model.h
     Model.cpp
     View.h

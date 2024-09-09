@@ -1,12 +1,9 @@
 #include "Model.h"
 #include "device.h"
+#include "misc.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "FileBrowser.h"
-
-#ifndef _WIN32
-#include <pwd.h>
-#endif
 
 /* consts */
 const int         DEFAULT_WINDOW_WIDTH  = 1600;
@@ -28,23 +25,7 @@ int main(int argc, char *argv[])
     struct nk_font *font;
     struct nk_font_atlas atlas;
 
-#ifdef _WIN32
-    std::string config_file = getenv("USERPROFILE");
-    if (config_file.empty()) {
-        config_file = getenv("HOMEDRIVE") + genenv("HOMEPATH");
-    }
-#else
-    std::string config_file = getenv("HOME");
-    if (config_file.empty()) {
-        struct passwd *pw = getpwuid(getuid());
-        if (!pw) {
-            throw std::runtime_error("getpwuid() failed");
-        }
-
-        config_file = pw->pw_dir;
-    }
-
-#endif
+    std::string config_file = get_home_dir();
 
     if (config_file.empty()) {
         //TODO: Home dir is not found, try to run without config somehow
