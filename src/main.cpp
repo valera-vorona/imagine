@@ -12,8 +12,8 @@
 const int         DEFAULT_WINDOW_WIDTH  = 1600;
 const int         DEFAULT_WINDOW_HEIGHT = 1000;
 
-const std::string IMAGE_DIR             = ".image";
-const std::string IMAGE_CONFIG          = "image.conf";
+const std::string IMAGINE_DIR           = ".imagine";
+const std::string IMAGINE_CONFIG        = "imagine.conf";
 
 int main(int argc, char *argv[])
 {
@@ -49,34 +49,37 @@ int main(int argc, char *argv[])
     if (config_file.empty()) {
         //TODO: Home dir is not found, try to run without config somehow
     } else {
-        config_file = std::filesystem::path(config_file) / IMAGE_DIR;
+        config_file = std::filesystem::path(config_file) / IMAGINE_DIR;
         if (!std::filesystem::exists(config_file)) {
             std::filesystem::create_directory(config_file);
         }
 
-        config_file = std::filesystem::path(config_file) / IMAGE_CONFIG;
+        config_file = std::filesystem::path(config_file) / IMAGINE_CONFIG;
         if (!std::filesystem::exists(config_file)) {
             std::ofstream{ config_file };
         }
     }
 
     std::fstream config_stream{ config_file };
-    nlohmann::json config = nlohmann::json::parse(config_stream);
+    nlohmann::json config = nlohmann::json::parse(config_stream, nullptr, false, true);
     config_stream.close();
 
-    try {
-        width  = config["width"].get<int>();
-    } catch (nlohmann::json::basic_json::exception &e) {
+    if (config.is_discarded()) {
         width = DEFAULT_WINDOW_WIDTH;
-    }
-
-    try {
-        height  = config["height"].get<int>();
-    } catch (nlohmann::json::basic_json::exception &e) {
         height = DEFAULT_WINDOW_HEIGHT;
-    }
+    } else {
+        try {
+            width  = config["width"].get<int>();
+        } catch (nlohmann::json::basic_json::exception &e) {
+            width = DEFAULT_WINDOW_WIDTH;
+        }
 
-    config_stream.seekg(0, config_stream.beg);
+        try {
+            height  = config["height"].get<int>();
+        } catch (nlohmann::json::basic_json::exception &e) {
+            height = DEFAULT_WINDOW_HEIGHT;
+        }
+    }
 
     /* GLFW */
     glfwSetErrorCallback(error_callback);

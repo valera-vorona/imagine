@@ -114,8 +114,12 @@ void free_image(int tex) {
         content_height(content_height) {
 
         std::ifstream config_stream(config_file); 
-        config = nlohmann::json::parse(config_stream);
+        config = nlohmann::json::parse(config_stream, nullptr, false, true);
         config_stream.close();
+
+        if (config.is_discarded()) {
+            config = nlohmann::json::parse("{}", nullptr, false, true);
+        }
 
         adopt_config();
 
