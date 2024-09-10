@@ -9,6 +9,11 @@
 
     struct GLFWwindow;
     struct nk_context;
+
+    namespace cv {
+        class VideoCapture;
+    }
+
     class View;
 
     struct image_meta {
@@ -18,11 +23,19 @@
         int n;
     };
 
+    enum Showing {
+        NOTHING = 0,
+        IMAGE,
+        VIDEO
+    };
+
     class Model {
     public:
 
         Model(std::string config_file, GLFWwindow *window, nk_context *ctx, int content_width, int content_height);
         ~Model();
+
+        void load(std::string filename);
 
         void add_browser(std::shared_ptr<Browser> browser);
 
@@ -45,6 +58,8 @@
 
         void reload_image();
 
+        Showing what_shawing() const { return showing; }
+
     protected:
         void setup_most_sutable_browser();
 
@@ -63,6 +78,8 @@
         int content_width;
         int content_height;
 
+        std::shared_ptr<cv::VideoCapture> vc;
+
         std::shared_ptr<View> view;
         std::unordered_map<std::string, std::shared_ptr<View>> views;
 
@@ -70,6 +87,8 @@
         std::vector<std::shared_ptr<Browser>> browsers;
 
         struct image_meta current_image_meta;
+
+        Showing showing = NOTHING;
 
         std::string path;
         std::string status;

@@ -72,34 +72,21 @@ int load_image(std::string filename, struct image_meta *image_meta) // throw std
     return mat_to_tex(im, image_meta);
 }
 
-int load_video(std::string filename, struct image_meta *image_meta) // throw std::runtine_error
+int load_video(std::string filename, std::shared_ptr<cv::VideoCapture> vc, struct image_meta *image_meta) // throw std::runtine_error
 {
     using namespace cv;
+ 
+    vc->open(filename);
 
-    auto vc = VideoCapture(filename);
-
-    if (!vc.isOpened()) {
+    if (!vc->isOpened()) {
         throw std::runtime_error(std::string("Can't open video file: '") + filename + "'");
     }
 
     Mat im;
 
-    vc >> im;
+    *vc >> im;
 
     return mat_to_tex(im, image_meta);
-}
-
-int load_anything(std::string filename, struct image_meta *image_meta) // throw std::runtine_error
-{
-    try {
-        return load_image(filename, image_meta);
-    } catch (std::runtime_error) {
-        try {
-            return load_video(filename, image_meta);
-        } catch (std::runtime_error) {
-            throw std::runtime_error(std::string("Can't open file: '") + filename + "'");
-        }
-    }
 }
 
 void free_image(int tex) {
@@ -111,7 +98,8 @@ void free_image(int tex) {
         window(window),
         ctx(ctx),
         content_width(content_width),
-        content_height(content_height) {
+        content_height(content_height),
+        vc(std::make_shared<cv::VideoCapture>()) {
 
         std::ifstream config_stream(config_file); 
         config = nlohmann::json::parse(config_stream, nullptr, false, true);
@@ -134,11 +122,7 @@ void free_image(int tex) {
 
         set_view_mode(config[CFG_VIEW_MODE].get<std::string>());
 
-        try {
-            load_anything(path, &current_image_meta);
-        } catch (std::runtime_error &e) {
-            status = e.what();
-        }
+        load(path);
     }
 
     Model::~Model() {
@@ -146,6 +130,25 @@ void free_image(int tex) {
 
         std::ofstream config_stream(config_file, std::ofstream::out | std::ofstream::trunc);
         config_stream << config;
+    }
+
+    void Model::load(std::string filename) {
+        if (vc->isOpened()) {
+            vc->release();
+        }
+
+        try {
+            load_image(filename, &current_image_meta);
+            showing = IMAGE;
+        } catch (std::runtime_error) {
+            try {
+                load_video(filename, vc, &current_image_meta);
+                showing = VIDEO;
+            } catch (std::runtime_error &e) {
+                showing = NOTHING;
+                status = e.what();
+            }
+        }
     }
 
     void Model::add_browser(std::shared_ptr<Browser> browser) {
@@ -159,6 +162,16 @@ void free_image(int tex) {
     }
 
     void Model::draw() {
+        if (showing == VIDEO) {
+            free_image(current_image_meta.id);
+
+            cv::Mat mat;
+
+            *vc >> mat;
+
+            mat_to_tex(mat, &current_image_meta);
+        }
+
         view->draw(content_width, content_height, &current_image_meta);
     }
 
@@ -168,7 +181,7 @@ void free_image(int tex) {
             path = browser->get_full_path();
             view->set_full_path(path.c_str());
             config[CFG_LATEST_SEEN] = path;
-            load_anything(path, &current_image_meta);
+            load(path);
         } catch (std::runtime_error &e) {
             status = e.what();
         }
