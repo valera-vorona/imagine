@@ -223,6 +223,16 @@ void free_image(int tex) {
         }
     }
 
+    void Model::enter() {
+        try {
+            if (browser->enter()) {
+                reload_image();
+            }
+        } catch (std::runtime_error &e) {
+            set_status(e.what());
+        }
+    }
+
     void Model::toggle_video_play() {
         video_paused = !video_paused;
         config[CFG_VIDEO][CFG_PAUSED] = video_paused;

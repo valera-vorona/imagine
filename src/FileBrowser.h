@@ -16,6 +16,7 @@
 
         bool prev() override;
         bool next() override;
+        bool enter() override;
 
         std::string get_path() const override;
         std::string get_full_path() const override;

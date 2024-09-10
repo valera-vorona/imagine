@@ -109,6 +109,19 @@
         }
     }
 
+    bool FileBrowser::enter() {
+        auto entry = std::ranges::find_if(files, [](const FileEntry &e) {
+            return e.is_active == true;
+        });
+
+        if (entry != files.end() && entry->is_directory) {
+            update_file(entry->name, true);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     std::string FileBrowser::get_path() const {
         return path;
     }

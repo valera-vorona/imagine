@@ -20,6 +20,10 @@
         return false;
     }
 
+    bool DummyBrowser::enter() {
+        return false;
+    }
+
     std::string DummyBrowser::get_path() const {
         return "";
     }

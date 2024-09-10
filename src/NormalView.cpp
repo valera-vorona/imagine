@@ -16,7 +16,7 @@
      * Path edit line   (h=48)
      * Image menu line  (h=48)
      * FIle list w=300 | Image w=* (h=*)
-     *                 | (optionally brogress bar h=16) 
+     *                 | (optionally progress bar h=16) 
      * Status bar       (h=24)
     */
     void NormalView::draw(int content_width, int content_height, struct image_meta *image, bool show_progress) {

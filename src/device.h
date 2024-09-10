@@ -280,6 +280,7 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
                 break;
 
             case GLFW_KEY_ENTER:
+                model->enter();
                 nk_input_key(ctx, NK_KEY_ENTER, 1);
                 break;
 

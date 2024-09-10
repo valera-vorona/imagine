@@ -57,6 +57,7 @@
 
         void up();
         void down();
+        void enter();
         void toggle_video_play();
 
         void toggle_view_mode();

@@ -26,6 +26,7 @@
 
         virtual bool prev() = 0;
         virtual bool next() = 0;
+        virtual bool enter() = 0;
 
         virtual std::string get_path() const = 0;
         virtual std::string get_full_path() const = 0;
