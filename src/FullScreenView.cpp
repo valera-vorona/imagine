@@ -20,9 +20,7 @@
 
         auto size = nk_window_get_content_region_size(ctx);
         const int width = size.x - 20;
-        const int height = size.y - 20;
-
-        //nk_layout_row_static(ctx, size.y, size.x, 1);
+        const int height = size.y - (show_progress ? 36 : 20);
 
         // Image
         // calculating aspect ratios of the image and the view
@@ -37,6 +35,10 @@
             nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
             //TODO: the same as above
             nk_image(ctx, nk_image_id(image->id));
+        }
+
+        if (show_progress) {
+            nk_progress(ctx, model->get_video_pos_ptr(), 1000. / model->get_video_fps() * model->get_video_frames_n(), nk_true);
         }
 
         nk_end(ctx);
