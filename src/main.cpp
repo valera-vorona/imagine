@@ -2,8 +2,12 @@
 #include "device.h"
 #include "misc.h"
 #include <fstream>
+#include <thread>
+#include <chrono>
 #include <nlohmann/json.hpp>
 #include "FileBrowser.h"
+
+#include <iostream>
 
 /* consts */
 const int         DEFAULT_WINDOW_WIDTH  = 1600;
@@ -82,7 +86,6 @@ int main(int argc, char *argv[])
     glfwSetMouseButtonCallback(win, mouse_button_input);
     glfwSetScrollCallback(win, scroll_input);
 
-
     /* OpenGL */
     glViewport(0, 0, width, height);
     glewExperimental = 1;
@@ -123,6 +126,8 @@ int main(int argc, char *argv[])
 
     while (!glfwWindowShouldClose(win))
     {
+        auto start = glfwGetTime();
+
         /* High DPI displays */
         struct nk_vec2 scale;
         glfwGetWindowSize(win, &width, &height);
@@ -134,10 +139,18 @@ int main(int argc, char *argv[])
         // but on my device they are the same
         model.set_size(width, height);
 
-        glfwWaitEvents();
+        if (model.what_showing() == Showing::VIDEO) {
+            auto fps = model.get_video_fps();
+            if (fps > 0.) {
+                glfwWaitEventsTimeout(1. / fps - (glfwGetTime() - start));
+                std::this_thread::sleep_for(std::chrono::milliseconds(int(1000. / fps - ((glfwGetTime() - start)) * 1000.)));
+                model.draw();
+            }
+        } else {
+            glfwWaitEvents();
+            model.draw();
+        }
 
-        /* GUI */
-        model.draw();
 
         /* Draw */
         glViewport(0, 0, display_width, display_height);

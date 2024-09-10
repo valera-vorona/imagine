@@ -84,8 +84,6 @@ int load_video(std::string filename, std::shared_ptr<cv::VideoCapture> vc, struc
 
     Mat im;
 
-    *vc >> im;
-
     return mat_to_tex(im, image_meta);
 }
 
@@ -144,6 +142,7 @@ void free_image(int tex) {
             try {
                 load_video(filename, vc, &current_image_meta);
                 showing = VIDEO;
+                video_fps = vc->get(cv::CAP_PROP_FPS);
             } catch (std::runtime_error &e) {
                 showing = NOTHING;
                 status = e.what();

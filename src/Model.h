@@ -46,6 +46,8 @@
         inline std::string get_status() const { return status; }
         inline void set_status(std::string new_status) { status = new_status; }
         inline std::shared_ptr<Browser> get_browser()  { return browser; }
+        inline Showing what_showing() const { return showing; }
+        inline double get_video_fps() const { return video_fps; }
 
         void set_size(int width, int height);
 
@@ -57,8 +59,6 @@
         void toggle_view_mode();
 
         void reload_image();
-
-        Showing what_shawing() const { return showing; }
 
     protected:
         void setup_most_sutable_browser();
@@ -89,6 +89,7 @@
         struct image_meta current_image_meta;
 
         Showing showing = NOTHING;
+        double video_fps = 0;
 
         std::string path;
         std::string status;
