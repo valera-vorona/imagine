@@ -57,6 +57,7 @@
 
         void up();
         void down();
+        void toggle_video_play();
 
         void toggle_view_mode();
 
@@ -96,6 +97,7 @@
         size_t video_pos        = 0;
         size_t video_pos2       = 0; // This var is to compare it with video_pos. If they are not equal, it means that video_pos was changed outside this class,
                                      // i.e. through Model::get_video_pos_ptr() with a progress bar
+        bool video_paused;
 
         std::string path;
         std::string status;

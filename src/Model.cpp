@@ -17,6 +17,8 @@ const std::string CFG_LATEST_SEEN           = "latest_seen";
 const std::string CFG_VIEW_MODE             = "view_mode";
 const std::string CFG_VIEW_MODE_NORMAL      = "normal";
 const std::string CFG_VIEW_MODE_FULLSCREEN  = "fullscreen";
+const std::string CFG_VIDEO                 = "video";
+const std::string CFG_PAUSED                = "paused";
 
 int mat_to_tex(const cv::Mat &im, image_meta *image_meta) {
     using namespace cv;
@@ -84,6 +86,8 @@ int load_video(std::string filename, std::shared_ptr<cv::VideoCapture> vc, struc
 
     Mat im;
 
+    *vc >> im;
+
     return mat_to_tex(im, image_meta);
 }
 
@@ -113,7 +117,8 @@ void free_image(int tex) {
         // all the other browsers can't
         add_browser(std::make_shared<DummyBrowser>());
 
-        path = config[CFG_LATEST_SEEN].get<std::string>();
+        path            = config[CFG_LATEST_SEEN].get<std::string>();
+        video_paused    = config[CFG_VIDEO][CFG_PAUSED].get<bool>();
 
         views[CFG_VIEW_MODE_NORMAL]     = std::make_shared<NormalView>(this, path.c_str());
         views[CFG_VIEW_MODE_FULLSCREEN] = std::make_shared<FullScreenView>(this, path.c_str());
@@ -163,7 +168,7 @@ void free_image(int tex) {
     }
 
     void Model::draw() {
-        if (showing == VIDEO) {
+        if (showing == VIDEO && !video_paused) {
             free_image(current_image_meta.id);
 
             if (video_pos != video_pos2) {
@@ -218,6 +223,11 @@ void free_image(int tex) {
         }
     }
 
+    void Model::toggle_video_play() {
+        video_paused = !video_paused;
+        config[CFG_VIDEO][CFG_PAUSED] = video_paused;
+    }
+
     void Model::toggle_view_mode() {
         if (config[CFG_VIEW_MODE] == CFG_VIEW_MODE_FULLSCREEN) {
             set_view_mode(CFG_VIEW_MODE_NORMAL);
@@ -253,6 +263,10 @@ void free_image(int tex) {
 
         if (!config[CFG_VIEW_MODE].is_string()) {
              config[CFG_VIEW_MODE] = CFG_VIEW_MODE_NORMAL;
+        }
+
+        if (!config[CFG_VIDEO][CFG_PAUSED].is_boolean()) {
+             config[CFG_VIDEO][CFG_PAUSED] = false;
         }
     }
 

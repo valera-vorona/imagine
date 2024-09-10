@@ -299,6 +299,10 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
                 nk_input_key(ctx, NK_KEY_RIGHT, 1);
                 break;
 
+            case GLFW_KEY_SPACE:
+                model->toggle_video_play();
+                break;
+
             case GLFW_KEY_C:
                 if (mods & GLFW_MOD_CONTROL) {
                     nk_input_key(ctx, NK_KEY_COPY, 1);
