@@ -16,9 +16,10 @@
      * Path edit line   (h=48)
      * Image menu line  (h=48)
      * FIle list w=300 | Image w=* (h=*)
+     *                 | (optionally brogress bar h=16) 
      * Status bar       (h=24)
     */
-    void NormalView::draw(int content_width, int content_height, struct image_meta *image) {
+    void NormalView::draw(int content_width, int content_height, struct image_meta *image, bool show_progress) {
         static const int LINE_HEIGHT = 24;
 
         auto ctx = model->get_context();
@@ -115,6 +116,10 @@
             width -= 20;
             height -= 20; // TODO: case 1: deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
 
+            if (show_progress) {
+                height -= 16;
+            }
+
             // calculating aspect ratios of the image and the view
             const float ar_image = (float)image->w / (float)image->h;
             const float ar_view  = (float)width / (float)height;
@@ -127,6 +132,10 @@
                 nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
                 //TODO: the same as above
                 nk_image(ctx, nk_image_id(image->id));
+            }
+
+            if (show_progress) {
+                nk_progress(ctx, model->get_video_pos_ptr(), 1000. / model->get_video_fps() * model->get_video_frames_n(), nk_true);
             }
 
             model->set_status( std::string("w: ") + std::to_string(image->w) +

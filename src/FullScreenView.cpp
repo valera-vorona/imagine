@@ -10,7 +10,7 @@
 
     }
 
-    void FullScreenView::draw(int content_width, int content_height, struct image_meta *image) {
+    void FullScreenView::draw(int content_width, int content_height, struct image_meta *image, bool show_progress) {
         auto ctx = model->get_context();
 
         if (!nk_begin(ctx, "FullScreenView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {

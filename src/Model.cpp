@@ -141,8 +141,10 @@ void free_image(int tex) {
         } catch (std::runtime_error) {
             try {
                 load_video(filename, vc, &current_image_meta);
-                showing = VIDEO;
-                video_fps = vc->get(cv::CAP_PROP_FPS);
+                showing                 = VIDEO;
+                video_fps               = vc->get(cv::CAP_PROP_FPS);
+                video_frames_n          = vc->get(cv::CAP_PROP_FRAME_COUNT);
+                video_pos = video_pos2  = vc->get(cv::CAP_PROP_POS_MSEC);
             } catch (std::runtime_error &e) {
                 showing = NOTHING;
                 status = e.what();
@@ -164,14 +166,20 @@ void free_image(int tex) {
         if (showing == VIDEO) {
             free_image(current_image_meta.id);
 
+            if (video_pos != video_pos2) {
+                vc->set(cv::CAP_PROP_POS_MSEC, (double)video_pos);
+            }
+
             cv::Mat mat;
 
             *vc >> mat;
 
             mat_to_tex(mat, &current_image_meta);
+
+            video_pos = video_pos2 = vc->get(cv::CAP_PROP_POS_MSEC);
         }
 
-        view->draw(content_width, content_height, &current_image_meta);
+        view->draw(content_width, content_height, &current_image_meta, showing == VIDEO);
     }
 
     void Model::reload_image() {
