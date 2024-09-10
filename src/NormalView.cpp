@@ -117,7 +117,7 @@
             height -= 20; // TODO: case 1: deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
 
             if (show_progress) {
-                height -= 16;
+                height -= 20; // it should be progress bar height + 4 by experiment. Perhaps it is the bar's or the group's border 
             }
 
             // calculating aspect ratios of the image and the view
@@ -135,6 +135,7 @@
             }
 
             if (show_progress) {
+                nk_layout_row_static(ctx, 16 , width, 1);
                 nk_progress(ctx, model->get_video_pos_ptr(), 1000. / model->get_video_fps() * model->get_video_frames_n(), nk_true);
             }
 
