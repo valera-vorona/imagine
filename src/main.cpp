@@ -142,8 +142,16 @@ int main(int argc, char *argv[])
         if (model.what_showing() == Showing::VIDEO) {
             auto fps = model.get_video_fps();
             if (fps > 0.) {
-                glfwWaitEventsTimeout(1. / fps - (glfwGetTime() - start));
-                std::this_thread::sleep_for(std::chrono::milliseconds(int(1000. / fps - ((glfwGetTime() - start)) * 1000.)));
+                auto timeout_sec = 1. / fps - (glfwGetTime() - start);
+                if (timeout_sec > 0.) {
+                    glfwWaitEventsTimeout(timeout_sec);
+                }
+
+                auto timeout_ms = std::chrono::milliseconds(int(1000. / fps - ((glfwGetTime() - start)) * 1000.));
+                if (timeout_ms > std::chrono::milliseconds(0)) {
+                    std::this_thread::sleep_for(timeout_ms);
+                }
+
                 model.draw();
             }
         } else {

@@ -139,10 +139,6 @@
                 nk_progress(ctx, model->get_video_pos_ptr(), 1000. / model->get_video_fps() * model->get_video_frames_n(), nk_true);
             }
 
-            model->set_status( std::string("w: ") + std::to_string(image->w) +
-                std::string(", h: ") + std::to_string(image->h) +
-                std::string(", n: ") + std::to_string(image->n) );
-
             nk_group_end(ctx);
         }
 

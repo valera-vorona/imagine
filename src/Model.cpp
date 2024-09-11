@@ -143,6 +143,10 @@ void free_image(int tex) {
         try {
             load_image(filename, &current_image_meta);
             showing = IMAGE;
+
+            status = std::string("w: ") + std::to_string(current_image_meta.w) +
+                ", h: " + std::to_string(current_image_meta.h) +
+                ", n: " + std::to_string(current_image_meta.n);
         } catch (std::runtime_error) {
             try {
                 load_video(filename, vc, &current_image_meta);
@@ -150,9 +154,16 @@ void free_image(int tex) {
                 video_fps               = vc->get(cv::CAP_PROP_FPS);
                 video_frames_n          = vc->get(cv::CAP_PROP_FRAME_COUNT);
                 video_pos = video_pos2  = vc->get(cv::CAP_PROP_POS_MSEC);
+
+                status = std::string("fps: ") + std::to_string((int)video_fps) +
+                    ", sec: " + std::to_string((int)(video_pos / 1000.)) +
+                    ", length: " + std::to_string((int)(video_frames_n / video_fps)) +
+                    ", w: " + std::to_string(current_image_meta.w) +
+                    ", h: " + std::to_string(current_image_meta.h) +
+                    ", n: " + std::to_string(current_image_meta.n);
             } catch (std::runtime_error &e) {
                 showing = NOTHING;
-                status = e.what();
+                status.clear();
             }
         }
     }
@@ -182,6 +193,12 @@ void free_image(int tex) {
             mat_to_tex(mat, &current_image_meta);
 
             video_pos = video_pos2 = vc->get(cv::CAP_PROP_POS_MSEC);
+                status = std::string("fps: ") + std::to_string((int)video_fps) +
+                    ", sec: " + std::to_string((int)(video_pos / 1000.)) +
+                    ", length: " + std::to_string((int)(video_frames_n / video_fps)) +
+                    ", w: " + std::to_string(current_image_meta.w) +
+                    ", h: " + std::to_string(current_image_meta.h) +
+                    ", n: " + std::to_string(current_image_meta.n);
         }
 
         view->draw(content_width, content_height, &current_image_meta, showing == VIDEO);
