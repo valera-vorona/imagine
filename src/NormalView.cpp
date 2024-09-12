@@ -42,11 +42,27 @@
             nk_layout_row_template_push_static(ctx, LINE_HEIGHT * 2);
         nk_layout_row_template_end(ctx);
 
-        nk_edit_string_zero_terminated(ctx, NK_EDIT_FIELD, path_buffer, MAX_PATH_LEN, nk_filter_default);
+
+        //auto c = ctx->current->edit->clip;
+        if (nk_edit_string_zero_terminated(ctx,
+            NK_EDIT_SIG_ENTER               |
+            NK_EDIT_ALLOW_TAB               |
+            NK_EDIT_SELECTABLE              |
+            NK_EDIT_CLIPBOARD               |
+            NK_EDIT_NO_HORIZONTAL_SCROLL    |
+            NK_EDIT_ALWAYS_INSERT_MODE      
+        , path_buffer, MAX_PATH_LEN, nk_filter_default) & NK_EDIT_COMMITED) {
+            try {
+                browser->update_path(path_buffer);
+                model->reload_image();
+            } catch (std::runtime_error &e) {
+                model->set_status(e.what());
+            }
+        }
 
         if (nk_button_symbol(ctx, NK_SYMBOL_CIRCLE_OUTLINE)) {
             try {
-                browser->update_path(path_buffer);
+                browser->update_path(path_buffer, true);
                 model->reload_image();
             } catch (std::runtime_error &e) {
                 model->set_status(e.what());

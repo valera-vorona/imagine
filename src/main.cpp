@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
     model.add_browser(std::make_shared<FileBrowser>());
 
     glfwSetWindowUserPointer(win, &model);
+    glfwSetInputMode(win, GLFW_STICKY_KEYS, GLFW_TRUE);
 
     while (!glfwWindowShouldClose(win))
     {
@@ -158,7 +159,6 @@ int main(int argc, char *argv[])
             glfwWaitEvents();
             model.draw();
         }
-
 
         /* Draw */
         glViewport(0, 0, display_width, display_height);
