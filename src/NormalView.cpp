@@ -50,7 +50,7 @@
             NK_EDIT_SELECTABLE              |
             NK_EDIT_CLIPBOARD               |
             NK_EDIT_NO_HORIZONTAL_SCROLL    |
-            NK_EDIT_ALWAYS_INSERT_MODE      
+            NK_EDIT_ALWAYS_INSERT_MODE
         , path_buffer, MAX_PATH_LEN, nk_filter_default) & NK_EDIT_COMMITED) {
             try {
                 browser->update_path(path_buffer);
