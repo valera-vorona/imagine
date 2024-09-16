@@ -45,11 +45,15 @@ int mat_to_tex(const cv::Mat &im, image_meta *image_meta) {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // GL_NEAREST is faster
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //don't use mipmaps, I wonder if it saves some time
+    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0);
+    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, ifmt, x, y, 0, fmt, GL_UNSIGNED_BYTE, im.ptr());
-    glGenerateMipmap(GL_TEXTURE_2D);
+    //glGenerateMipmap(GL_TEXTURE_2D);
 
     if (image_meta) {
         image_meta->id = tex;
@@ -154,6 +158,11 @@ void free_image(int tex) {
                 video_fps               = vc->get(cv::CAP_PROP_FPS);
                 video_frames_n          = vc->get(cv::CAP_PROP_FRAME_COUNT);
                 video_pos = video_pos2  = vc->get(cv::CAP_PROP_POS_MSEC);
+
+// Uncomment it if the fps id too fast
+//                if (video_fps > 100. || video_fps < 1.) {
+//                    video_fps = 20.;
+//                }
 
                 status = std::string("fps: ") + std::to_string((int)video_fps) +
                     ", sec: " + std::to_string((int)(video_pos / 1000.)) +
