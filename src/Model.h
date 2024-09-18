@@ -4,7 +4,6 @@
 #include "Browser.h"
 #include <memory>
 #include <vector>
-#include <unordered_map>
 #include <nlohmann/json.hpp>
 
     struct GLFWwindow;
@@ -15,6 +14,8 @@
     }
 
     class View;
+    class Cache;
+    class Loader;
 
     struct image_meta {
         int id;
@@ -82,8 +83,6 @@
         int content_width;
         int content_height;
 
-        std::shared_ptr<cv::VideoCapture> vc;
-
         std::shared_ptr<View> view;
         std::unordered_map<std::string, std::shared_ptr<View>> views;
 
@@ -99,6 +98,9 @@
         size_t video_pos2       = 0; // This var is to compare it with video_pos. If they are not equal, it means that video_pos was changed outside this class,
                                      // i.e. through Model::get_video_pos_ptr() with a progress bar
         bool video_paused;
+
+        std::shared_ptr<Cache> cache;
+        std::shared_ptr<Loader> loader;
 
         std::string path;
         std::string status;

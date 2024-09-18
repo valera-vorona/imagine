@@ -15,6 +15,10 @@ set(SOURCE_EXE
     misc.cpp
     Model.h
     Model.cpp
+    Loader.h
+    Loader.cpp
+    Cache.h
+    Cache.cpp
     View.h
     View.cpp
     NormalView.h

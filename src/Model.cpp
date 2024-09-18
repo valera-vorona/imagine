@@ -1,16 +1,14 @@
 #include "Model.h"
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <opencv2/opencv.hpp>
-
-#include <fstream>
-#include <stdexcept>
-
 #include "NormalView.h"
 #include "FullScreenView.h"
 #include "DummyBrowser.h"
+#include "Cache.h"
+#include "Loader.h"
 #include "misc.h"
+
+#include <GLFW/glfw3.h>
+#include <fstream>
+#include <stdexcept>
 
 /* config constants */
 const std::string CFG_LATEST_SEEN           = "latest_seen";
@@ -70,7 +68,6 @@ int load_image(std::string filename, struct image_meta *image_meta) // throw std
     using namespace cv;
 
     auto im = imread(filename, IMREAD_UNCHANGED);
-
     if (im.empty()) {
         throw std::runtime_error(std::string("Can't open image file: '") + filename + "'");
     }
@@ -104,8 +101,7 @@ void free_image(int tex) {
         window(window),
         ctx(ctx),
         content_width(content_width),
-        content_height(content_height),
-        vc(std::make_shared<cv::VideoCapture>()) {
+        content_height(content_height) {
 
         std::ifstream config_stream(config_file); 
         config = nlohmann::json::parse(config_stream, nullptr, false, true);
@@ -140,10 +136,6 @@ void free_image(int tex) {
     }
 
     void Model::load(std::string filename) {
-        if (vc->isOpened()) {
-            vc->release();
-        }
-
         try {
             load_image(filename, &current_image_meta);
             showing = IMAGE;
@@ -153,23 +145,26 @@ void free_image(int tex) {
                 ", n: " + std::to_string(current_image_meta.n);
         } catch (std::runtime_error) {
             try {
-                load_video(filename, vc, &current_image_meta);
                 showing                 = VIDEO;
-                video_fps               = vc->get(cv::CAP_PROP_FPS);
-                video_frames_n          = vc->get(cv::CAP_PROP_FRAME_COUNT);
-                video_pos = video_pos2  = vc->get(cv::CAP_PROP_POS_MSEC);
+                video_fps               = 15;//vc->get(cv::CAP_PROP_FPS);
+                video_frames_n          = 100000;//vc->get(cv::CAP_PROP_FRAME_COUNT);
+                video_pos = video_pos2  = 0.0;//vc->get(cv::CAP_PROP_POS_MSEC);
 
 // Uncomment it if the fps id too fast
 //                if (video_fps > 100. || video_fps < 1.) {
 //                    video_fps = 20.;
 //                }
 
+        //TODO: loader should be created at a smarter way
+        loader = std::make_shared<Loader>(filename, 4);
+        cache = std::make_shared<Cache>(Period{0, 0}, Period{10, 20}, loader);
+/*
                 status = std::string("fps: ") + std::to_string((int)video_fps) +
                     ", sec: " + std::to_string((int)(video_pos / 1000.)) +
                     ", length: " + std::to_string((int)(video_frames_n / video_fps)) +
                     ", w: " + std::to_string(current_image_meta.w) +
                     ", h: " + std::to_string(current_image_meta.h) +
-                    ", n: " + std::to_string(current_image_meta.n);
+                    ", n: " + std::to_string(current_image_meta.n);*/
             } catch (std::runtime_error &e) {
                 showing = NOTHING;
                 status.clear();
@@ -189,19 +184,16 @@ void free_image(int tex) {
 
     void Model::draw() {
         if (showing == VIDEO && !video_paused) {
+            auto mat = cache->next();
             free_image(current_image_meta.id);
 
-            if (video_pos != video_pos2) {
+            /*if (video_pos != video_pos2) {
                 vc->set(cv::CAP_PROP_POS_MSEC, (double)video_pos);
-            }
-
-            cv::Mat mat;
-
-            *vc >> mat;
+            }*/
 
             mat_to_tex(mat, &current_image_meta);
 
-            video_pos = video_pos2 = vc->get(cv::CAP_PROP_POS_MSEC);
+            //video_pos = video_pos2 = vc->get(cv::CAP_PROP_POS_MSEC);
                 status = std::string("fps: ") + std::to_string((int)video_fps) +
                     ", sec: " + std::to_string((int)(video_pos / 1000.)) +
                     ", length: " + std::to_string((int)(video_frames_n / video_fps)) +
