@@ -137,7 +137,7 @@ void free_image(int tex) {
                 }
 
                 loader = std::make_shared<Loader>(filename, &current_media, 4);
-                cache = std::make_shared<Cache>(Period{0, 0}, Period{10, 20}, loader);
+                cache = std::make_shared<Cache>(Period{0, 0}, Period{10, 20}, current_media.frames_n, loader);
                 showing = VIDEO;
 
                 if (current_media.fps < 1. || current_media.fps > 200.) {

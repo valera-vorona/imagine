@@ -17,7 +17,7 @@
 
     class Cache {
     public:
-        Cache(Period backward, Period forward, std::shared_ptr<Loader> loader);
+        Cache(Period backward, Period forward, size_t max_size, std::shared_ptr<Loader> loader);
 
         size_t next(cv::Mat &mat);
         size_t set(cv::Mat &mat, size_t pos);
@@ -27,6 +27,7 @@
 
         Period backward;
         Period forward;
+        const size_t MAX_SIZE;
         Blocks data;
         Block::size_type i, bi; // next item to read data[bi][i]
         const int BLOCK_SIZE;

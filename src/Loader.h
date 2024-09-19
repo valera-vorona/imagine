@@ -17,7 +17,7 @@
     class Worker {
         Worker(std::string filename, int offs, int step, std::atomic_int *read, std::atomic_int *done);
 
-        std::thread load(Block &texs, int rounds_n);
+        std::thread load(Block &texs, int rounds_n, size_t pos);
 
         std::shared_ptr<cv::VideoCapture> vc;
 
@@ -34,8 +34,8 @@
     public:
         Loader(std::string filename, media_data *image, int threads_n = 1); // throw std::runtime_error
 
-        void load_sync(Block &texs, int frames_n);
-        void load_async(Block &texs, int frames_n);
+        void load_sync(Block &texs, int frames_n, size_t pos = -1);
+        void load_async(Block &texs, int frames_n, size_t pos = -1);
 
         bool complete() const;
         bool done() const;
