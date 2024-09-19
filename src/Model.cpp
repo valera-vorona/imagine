@@ -171,7 +171,6 @@ void free_image(int tex) {
             cv::Mat mat;
 
             if (current_media.pos != current_media.pos2) {
-                //cache->set(mat, current_media_pos);
                 current_media.pos2 = current_media.pos = cache->set(mat, current_media.pos);
             } else {
                 current_media.pos = current_media.pos2 = cache->next(mat);

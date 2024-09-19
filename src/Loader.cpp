@@ -6,47 +6,47 @@
 
 struct image_meta;
 
-    Worker::Worker(std::string filename, int offs, int step, std::atomic_int *done) :
+    Worker::Worker(std::string filename, int offs, int step, std::atomic_int *read, std::atomic_int *done) :
     vc(std::make_shared<cv::VideoCapture>(filename)),
     offs(offs),
     step(step),
+    read(read),
     done(done) {
         //vc->set(cv::CAP_PROP_POS_FRAMES, 0.);
     }
 
     std::thread Worker::load(Block &texs, int rounds_n) {
         return std::thread([this, &texs, rounds_n]{
+            auto succeed = true;
             if (!vc->isOpened()) {
 
             }
 
-            for (auto r = 0; r < rounds_n; ++r) {
-                for (auto i = 0; i < offs; ++i) {
-                    vc->grab();
+            for (auto r = 0; succeed && r < rounds_n; ++r) {
+                for (auto i = 0; succeed && i < offs; ++i) {
+                    succeed &= vc->grab();
                 }
 
-                if (!vc->read(texs[r * step + offs])) {
-                    puts("no more images in video");
-                }
+                succeed &= succeed && vc->read(texs[r * step + offs]);
 
-                //if (texs[r * step + offs].empty()) {
-                //    TODO: do something 
-                //}
-
-                for (auto i = step - 1; i > offs; --i) {
-                    vc->grab();
+                for (auto i = step - 1; succeed && i > offs; --i) {
+                    succeed &= vc->grab();
                 }
+            }
+
+            if (succeed) {
+                ++*read;
             }
 
             ++*done;
         });
     }
 
-    Loader::Loader(std::string filename, media_data *media, int threads_n = 1) :
+    Loader::Loader(std::string filename, media_data *media, int threads_n) :
     threads_n(threads_n),
     done_(threads_n) {
         for (auto i = 0; i < threads_n; ++i) {
-            workers.push_back({filename, i, threads_n, &done_});
+            workers.push_back({filename, i, threads_n, &read_, &done_});
             if (!workers.back().vc->isOpened()) {
                 throw std::runtime_error(std::string("Can't open video file: '") + filename + "'");
             }
@@ -64,7 +64,7 @@ struct image_meta;
 
     void Loader::load_sync(Block &texs, int frames_n) {
         while (!done());
-        done_ = 0;
+        read_ = done_ = 0;
         for (auto i = 0; i < threads_n; ++i) {
             workers[i].load(texs, frames_n / threads_n + (i < frames_n % threads_n ? 1 : 0)).detach();
         }
@@ -72,7 +72,7 @@ struct image_meta;
 
     void Loader::load_async(Block &texs, int frames_n) {
         while (!done());
-        done_ = 0;
+        read_ = done_ = 0;
         std::vector<std::thread> ths;
         ths.reserve(threads_n);
         for (auto i = 0; i < threads_n; ++i) {
@@ -82,6 +82,10 @@ struct image_meta;
         for (auto &t: ths) {
             t.join();
         }
+    }
+
+    bool Loader::complete() const {
+        return read_ == threads_n;
     }
 
     bool Loader::done() const {
