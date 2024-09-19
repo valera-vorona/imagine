@@ -30,6 +30,17 @@
         }
     }
 
+    size_t Cache::set(cv::Mat &mat, size_t pos) {
+        if ((pos - 1)/ BLOCK_SIZE < data.size()) {
+            // rewind
+            bi = pos / BLOCK_SIZE;
+            i = pos % BLOCK_SIZE;
+        }
+
+        mat = data[bi][i];
+        return bi * BLOCK_SIZE + i;
+    }
+
     void Cache::check_forward() {
         if ((data.size() - bi - 1) * BLOCK_SIZE < forward.min) {
             if (loader->done()) {

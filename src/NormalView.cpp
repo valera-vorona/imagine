@@ -150,6 +150,7 @@
                 nk_image(ctx, nk_image_id(media->id));
             }
 
+            // Progress bar
             if (show_progress) {
                 nk_layout_row_static(ctx, 16 , width, 1);
                 nk_progress(ctx, model->get_video_pos_ptr(), model->get_video_frames_n(), nk_true);

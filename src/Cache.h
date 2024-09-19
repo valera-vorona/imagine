@@ -20,6 +20,7 @@
         Cache(Period backward, Period forward, std::shared_ptr<Loader> loader);
 
         size_t next(cv::Mat &mat);
+        size_t set(cv::Mat &mat, size_t pos);
 
     protected:
         void check_forward();

@@ -164,12 +164,15 @@ void free_image(int tex) {
 
     void Model::draw() {
         if (showing == VIDEO && !video_paused) {
+            cv::Mat mat;
+
             if (current_media.pos != current_media.pos2) {
-                //TODO: imapelent video pos change
+                //cache->set(mat, current_media_pos);
+                current_media.pos2 = current_media.pos = cache->set(mat, current_media.pos);
+            } else {
+                current_media.pos = current_media.pos2 = cache->next(mat);
             }
 
-            cv::Mat mat;
-            current_media.pos = current_media.pos2 = cache->next(mat);
             free_image(current_media.id);
             mat_to_tex(mat, &current_media);
 
