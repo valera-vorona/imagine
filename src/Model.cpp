@@ -116,6 +116,10 @@ void free_image(int tex) {
 
         std::ofstream config_stream(config_file, std::ofstream::out | std::ofstream::trunc);
         config_stream << config;
+
+        if (loader) {
+            while (!loader->done());
+        }
     }
 
     void Model::load(std::string filename) {
