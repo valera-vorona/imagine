@@ -63,6 +63,7 @@ struct image_meta;
     }
 
     void Loader::load_sync(Block &texs, int frames_n) {
+        while (!done());
         done_ = 0;
         for (auto i = 0; i < threads_n; ++i) {
             workers[i].load(texs, frames_n / threads_n + (i < frames_n % threads_n ? 1 : 0)).detach();
@@ -70,6 +71,7 @@ struct image_meta;
     }
 
     void Loader::load_async(Block &texs, int frames_n) {
+        while (!done());
         done_ = 0;
         std::vector<std::thread> ths;
         ths.reserve(threads_n);

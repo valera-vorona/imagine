@@ -128,6 +128,9 @@ void free_image(int tex) {
                 ", n: " + std::to_string(current_media.n);
         } catch (std::runtime_error) {
             try {
+                if (loader) {
+                    while (!loader->done());
+                }
 
                 loader = std::make_shared<Loader>(filename, &current_media, 4);
                 cache = std::make_shared<Cache>(Period{0, 0}, Period{10, 20}, loader);
