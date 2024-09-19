@@ -12,6 +12,8 @@
         class VideoCapture;
     }
 
+    struct media_data;
+
     class Worker {
         Worker(std::string filename, int offs, int step, std::atomic_int *done);
         std::thread load(Block &texs, int rounds_n);
@@ -28,7 +30,7 @@
 
     class Loader {
     public:
-        Loader(std::string filename, int threads_n);
+        Loader(std::string filename, media_data *image, int threads_n); // throw std::runtime_error
 
         void load_sync(Block &texs, int frames_n);
         void load_async(Block &texs, int frames_n);

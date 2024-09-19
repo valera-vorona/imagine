@@ -11,12 +11,13 @@
 
     }
 
-    cv::Mat &Cache::next() {
+    size_t Cache::next(cv::Mat &mat) {
         for (;;) {
             if (bi < data.size()) {
                 if (i < BLOCK_SIZE) {
                     check_forward();
-                    return data[bi][i++];
+                    mat = data[bi][i];
+                    return bi * BLOCK_SIZE + i++;
                 } else {
                     i = 0;
                     ++bi;

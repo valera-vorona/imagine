@@ -17,11 +17,16 @@
     class Cache;
     class Loader;
 
-    struct image_meta {
-        int id;
-        int w;
-        int h;
-        int n;
+    struct media_data {
+        int id;             // OpenGL image name
+        int w;              // Width
+        int h;              // Height
+        int n;              // Image element size
+        double fps;         // Frames per second in video file
+        double frames_n;    // Number of frames in video file
+        size_t pos;         // Current position in video file
+        size_t pos2;        // This var is to compare it with video_pos. If they are not equal, it means that video_pos was changed outside this class,
+                            // i.e. through Model::get_video_pos_ptr() with a progress bar
     };
 
     enum Showing {
@@ -48,9 +53,9 @@
         inline void set_status(std::string new_status) { status = new_status; }
         inline std::shared_ptr<Browser> get_browser()  { return browser; }
         inline Showing what_showing() const { return showing; }
-        inline double get_video_fps() const { return video_fps; }
-        inline double get_video_frames_n() const { return video_frames_n; }
-        inline size_t *get_video_pos_ptr() { return &video_pos; }
+        inline double get_video_fps() const { return current_media.fps; }
+        inline double get_video_frames_n() const { return current_media.frames_n; }
+        inline size_t *get_video_pos_ptr() { return &current_media.pos; }
 
         void set_size(int width, int height);
 
@@ -89,14 +94,10 @@
         std::shared_ptr<Browser> browser;
         std::vector<std::shared_ptr<Browser>> browsers;
 
-        struct image_meta current_image_meta;
+        media_data current_media;
 
         Showing showing = NOTHING;
-        double video_fps        = 0;
-        double video_frames_n   = 0;
-        size_t video_pos        = 0;
-        size_t video_pos2       = 0; // This var is to compare it with video_pos. If they are not equal, it means that video_pos was changed outside this class,
-                                     // i.e. through Model::get_video_pos_ptr() with a progress bar
+
         bool video_paused;
 
         std::shared_ptr<Cache> cache;

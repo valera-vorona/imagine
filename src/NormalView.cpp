@@ -19,7 +19,7 @@
      *                 | (optionally progress bar h=16) 
      * Status bar       (h=24)
     */
-    void NormalView::draw(int content_width, int content_height, struct image_meta *image, bool show_progress) {
+    void NormalView::draw(int content_width, int content_height, struct media_data *media, bool show_progress) {
         static const int LINE_HEIGHT = 24;
 
         auto ctx = model->get_context();
@@ -137,22 +137,22 @@
             }
 
             // calculating aspect ratios of the image and the view
-            const float ar_image = (float)image->w / (float)image->h;
+            const float ar_image = (float)media->w / (float)media->h;
             const float ar_view  = (float)width / (float)height;
 
             if (ar_image > ar_view) {
                 nk_layout_row_static(ctx, (float)width / ar_image , width, 1);
                 //TODO: I create nk_image here every frame, maybe I should prepare it outside this function and send it as an argument
-                nk_image(ctx, nk_image_id(image->id));
+                nk_image(ctx, nk_image_id(media->id));
             } else {
                 nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
                 //TODO: the same as above
-                nk_image(ctx, nk_image_id(image->id));
+                nk_image(ctx, nk_image_id(media->id));
             }
 
             if (show_progress) {
                 nk_layout_row_static(ctx, 16 , width, 1);
-                nk_progress(ctx, model->get_video_pos_ptr(), 1000. / model->get_video_fps() * model->get_video_frames_n(), nk_true);
+                nk_progress(ctx, model->get_video_pos_ptr(), model->get_video_frames_n(), nk_true);
             }
 
             nk_group_end(ctx);

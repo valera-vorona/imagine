@@ -1,7 +1,7 @@
 #ifndef __VIEW__
 #define __VIEW__
 
-    struct image_meta;
+    struct media_data;
     class Model;
 
     class View {
@@ -10,7 +10,7 @@
         View(Model *model, const char *path); // throw std::runtime_error
         virtual ~View() = default;
 
-        virtual void draw(int content_width, int content_height, struct image_meta *image, bool show_progress = false) = 0;
+        virtual void draw(int content_width, int content_height, media_data *media, bool show_progress = false) = 0;
         void set_full_path(const char *path); // throw std::runtime_error
 
     protected:

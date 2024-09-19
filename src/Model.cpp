@@ -18,7 +18,7 @@ const std::string CFG_VIEW_MODE_FULLSCREEN  = "fullscreen";
 const std::string CFG_VIDEO                 = "video";
 const std::string CFG_PAUSED                = "paused";
 
-int mat_to_tex(const cv::Mat &im, image_meta *image_meta) {
+int mat_to_tex(const cv::Mat &im, media_data *media) {
     using namespace cv;
 
     int x,y,n;
@@ -53,17 +53,17 @@ int mat_to_tex(const cv::Mat &im, image_meta *image_meta) {
     glTexImage2D(GL_TEXTURE_2D, 0, ifmt, x, y, 0, fmt, GL_UNSIGNED_BYTE, im.ptr());
     //glGenerateMipmap(GL_TEXTURE_2D);
 
-    if (image_meta) {
-        image_meta->id = tex;
-        image_meta->w = x;
-        image_meta->h = y;
-        image_meta->n = n;
+    if (media) {
+        media->id = tex;
+        media->w = x;
+        media->h = y;
+        media->n = n;
     }
 
     return tex;
 }
 
-int load_image(std::string filename, struct image_meta *image_meta) // throw std::runtime_error
+int load_image(std::string filename, struct media_data *media_data) // throw std::runtime_error
 {
     using namespace cv;
 
@@ -72,24 +72,7 @@ int load_image(std::string filename, struct image_meta *image_meta) // throw std
         throw std::runtime_error(std::string("Can't open image file: '") + filename + "'");
     }
 
-    return mat_to_tex(im, image_meta);
-}
-
-int load_video(std::string filename, std::shared_ptr<cv::VideoCapture> vc, struct image_meta *image_meta) // throw std::runtine_error
-{
-    using namespace cv;
- 
-    vc->open(filename);
-
-    if (!vc->isOpened()) {
-        throw std::runtime_error(std::string("Can't open video file: '") + filename + "'");
-    }
-
-    Mat im;
-
-    *vc >> im;
-
-    return mat_to_tex(im, image_meta);
+    return mat_to_tex(im, media_data);
 }
 
 void free_image(int tex) {
@@ -129,7 +112,7 @@ void free_image(int tex) {
     }
 
     Model::~Model() {
-        free_image(current_image_meta.id);
+        free_image(current_media.id);
 
         std::ofstream config_stream(config_file, std::ofstream::out | std::ofstream::trunc);
         config_stream << config;
@@ -137,34 +120,28 @@ void free_image(int tex) {
 
     void Model::load(std::string filename) {
         try {
-            load_image(filename, &current_image_meta);
+            load_image(filename, &current_media);
             showing = IMAGE;
 
-            status = std::string("w: ") + std::to_string(current_image_meta.w) +
-                ", h: " + std::to_string(current_image_meta.h) +
-                ", n: " + std::to_string(current_image_meta.n);
+            status = std::string("w: ") + std::to_string(current_media.w) +
+                ", h: " + std::to_string(current_media.h) +
+                ", n: " + std::to_string(current_media.n);
         } catch (std::runtime_error) {
             try {
-                showing                 = VIDEO;
-                video_fps               = 15;//vc->get(cv::CAP_PROP_FPS);
-                video_frames_n          = 100000;//vc->get(cv::CAP_PROP_FRAME_COUNT);
-                video_pos = video_pos2  = 0.0;//vc->get(cv::CAP_PROP_POS_MSEC);
 
-// Uncomment it if the fps id too fast
-//                if (video_fps > 100. || video_fps < 1.) {
-//                    video_fps = 20.;
-//                }
+                loader = std::make_shared<Loader>(filename, &current_media, 4);
+                cache = std::make_shared<Cache>(Period{0, 0}, Period{10, 20}, loader);
+                showing = VIDEO;
 
-        //TODO: loader should be created at a smarter way
-        loader = std::make_shared<Loader>(filename, 4);
-        cache = std::make_shared<Cache>(Period{0, 0}, Period{10, 20}, loader);
-/*
-                status = std::string("fps: ") + std::to_string((int)video_fps) +
-                    ", sec: " + std::to_string((int)(video_pos / 1000.)) +
-                    ", length: " + std::to_string((int)(video_frames_n / video_fps)) +
-                    ", w: " + std::to_string(current_image_meta.w) +
-                    ", h: " + std::to_string(current_image_meta.h) +
-                    ", n: " + std::to_string(current_image_meta.n);*/
+                if (current_media.fps < 1. || current_media.fps > 200.) {
+                    current_media.fps = 20;
+                }
+
+                status = std::string("fps: ") + std::to_string((int)current_media.fps) +
+                    ", sec: " + std::to_string((int)(current_media.pos / current_media.fps)) +
+                    ", length: " + std::to_string((int)(current_media.frames_n / current_media.fps)) +
+                    ", w: " + std::to_string(current_media.w) +
+                    ", h: " + std::to_string(current_media.h);
             } catch (std::runtime_error &e) {
                 showing = NOTHING;
                 status.clear();
@@ -184,30 +161,29 @@ void free_image(int tex) {
 
     void Model::draw() {
         if (showing == VIDEO && !video_paused) {
-            auto mat = cache->next();
-            free_image(current_image_meta.id);
+            if (current_media.pos != current_media.pos2) {
+                //TODO: imapelent video pos change
+            }
 
-            /*if (video_pos != video_pos2) {
-                vc->set(cv::CAP_PROP_POS_MSEC, (double)video_pos);
-            }*/
+            cv::Mat mat;
+            current_media.pos = current_media.pos2 = cache->next(mat);
+            free_image(current_media.id);
+            mat_to_tex(mat, &current_media);
 
-            mat_to_tex(mat, &current_image_meta);
-
-            //video_pos = video_pos2 = vc->get(cv::CAP_PROP_POS_MSEC);
-                status = std::string("fps: ") + std::to_string((int)video_fps) +
-                    ", sec: " + std::to_string((int)(video_pos / 1000.)) +
-                    ", length: " + std::to_string((int)(video_frames_n / video_fps)) +
-                    ", w: " + std::to_string(current_image_meta.w) +
-                    ", h: " + std::to_string(current_image_meta.h) +
-                    ", n: " + std::to_string(current_image_meta.n);
+            status = std::string("fps: ") + std::to_string((int)current_media.fps) +
+                ", sec: " + std::to_string((int)(current_media.pos / current_media.fps)) +
+                ", length: " + std::to_string((int)(current_media.frames_n / current_media.fps)) +
+                ", w: " + std::to_string(current_media.w) +
+                ", h: " + std::to_string(current_media.h) +
+                ", n: " + std::to_string(current_media.n);
         }
 
-        view->draw(content_width, content_height, &current_image_meta, showing == VIDEO);
+        view->draw(content_width, content_height, &current_media, showing == VIDEO);
     }
 
     void Model::reload_image() {
         try {
-            free_image(current_image_meta.id);
+            free_image(current_media.id);
             path = browser->get_full_path();
             view->set_full_path(path.c_str());
             config[CFG_LATEST_SEEN] = path;

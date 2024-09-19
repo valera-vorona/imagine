@@ -1,7 +1,8 @@
 #include "Loader.h"
-#include "Cache.h"
+#include "Model.h"
 #include <opencv2/opencv.hpp>
 #include <GL/gl.h>
+#include <stdexcept>
 
 struct image_meta;
 
@@ -41,11 +42,23 @@ struct image_meta;
         });
     }
 
-    Loader::Loader(std::string filename, int threads_n) :
+    Loader::Loader(std::string filename, media_data *media, int threads_n = 1) :
     threads_n(threads_n),
     done_(threads_n) {
         for (auto i = 0; i < threads_n; ++i) {
             workers.push_back({filename, i, threads_n, &done_});
+            if (!workers.back().vc->isOpened()) {
+                throw std::runtime_error(std::string("Can't open video file: '") + filename + "'");
+            }
+        }
+
+        if (media && threads_n > 0) {
+            const auto &vc = workers[0].vc;
+            media->w                    = vc->get(cv::CAP_PROP_FRAME_WIDTH);
+            media->h                    = vc->get(cv::CAP_PROP_FRAME_HEIGHT);
+            media->fps                  = vc->get(cv::CAP_PROP_FPS);
+            media->frames_n             = vc->get(cv::CAP_PROP_FRAME_COUNT);
+            media->pos = media->pos2    = vc->get(cv::CAP_PROP_POS_MSEC);
         }
     }
 
