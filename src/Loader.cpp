@@ -15,7 +15,7 @@ struct image_meta;
 
     }
 
-    std::thread Worker::load(Block &texs, int rounds_n, size_t pos) {
+    std::thread Worker::load(Cache::Chunk &texs, int rounds_n, size_t pos) {
         return std::thread([this, &texs, rounds_n, pos] {
             if ((signed long int)pos != -1) {
                 vc->set(cv::CAP_PROP_POS_FRAMES, pos);
@@ -63,11 +63,10 @@ struct image_meta;
             media->h                    = vc->get(cv::CAP_PROP_FRAME_HEIGHT);
             media->fps                  = vc->get(cv::CAP_PROP_FPS);
             media->frames_n             = vc->get(cv::CAP_PROP_FRAME_COUNT);
-            media->pos = media->pos2    = vc->get(cv::CAP_PROP_POS_MSEC);
         }
     }
 
-    void Loader::load_sync(Block &texs, int frames_n, size_t pos) {
+    void Loader::load_sync(Cache::Chunk &texs, int frames_n, size_t pos) {
         while (!done());
         read_ = done_ = 0;
         for (auto i = 0; i < threads_n; ++i) {
@@ -75,7 +74,7 @@ struct image_meta;
         }
     }
 
-    void Loader::load_async(Block &texs, int frames_n, size_t pos) {
+    void Loader::load_async(Cache::Chunk &texs, int frames_n, size_t pos) {
         while (!done());
         read_ = done_ = 0;
         std::vector<std::thread> ths;

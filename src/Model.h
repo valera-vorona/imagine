@@ -2,6 +2,7 @@
 #define __MODEL__
 
 #include "Browser.h"
+#include "Cache.h"
 #include <memory>
 #include <vector>
 #include <nlohmann/json.hpp>
@@ -25,8 +26,6 @@
         double fps;         // Frames per second in video file
         double frames_n;    // Number of frames in video file
         size_t pos;         // Current position in video file
-        size_t pos2;        // This var is to compare it with video_pos. If they are not equal, it means that video_pos was changed outside this class,
-                            // i.e. through Model::get_video_pos_ptr() with a progress bar
     };
 
     enum Showing {
@@ -101,6 +100,7 @@
         bool video_paused;
 
         std::shared_ptr<Cache> cache;
+        Cache::iterator cache_i;
         std::shared_ptr<Loader> loader;
 
         std::string path;

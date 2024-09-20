@@ -2,7 +2,6 @@
 #include "NormalView.h"
 #include "FullScreenView.h"
 #include "DummyBrowser.h"
-#include "Cache.h"
 #include "Loader.h"
 #include "misc.h"
 
@@ -138,10 +137,12 @@ void free_image(int tex) {
 
                 loader = std::make_shared<Loader>(filename, &current_media, 4);
                 cache = std::make_shared<Cache>(Period{0, 0}, Period{10, 20}, current_media.frames_n, loader);
+                cache_i = cache->begin();
+                current_media.pos = cache_i.index();
                 showing = VIDEO;
 
                 if (current_media.fps < 1. || current_media.fps > 200.) {
-                    current_media.fps = 20;
+                    current_media.fps = 20.;
                 }
 
                 status = std::string("fps: ") + std::to_string((int)current_media.fps) +
@@ -170,10 +171,14 @@ void free_image(int tex) {
         if (showing == VIDEO && !video_paused) {
             cv::Mat mat;
 
-            if (current_media.pos != current_media.pos2) {
-                current_media.pos2 = current_media.pos = cache->set(mat, current_media.pos);
+            if (current_media.pos != cache_i.index()) {
+                //current_media.pos2 = current_media.pos = cache->set(mat, current_media.pos);
+                cache_i = current_media.pos;
+                mat = *cache_i;
             } else {
-                current_media.pos = current_media.pos2 = cache->next(mat);
+                //current_media.pos = current_media.pos2 = cache->next(mat);
+                mat = *cache_i++;
+                current_media.pos = cache_i.index();
             }
 
             free_image(current_media.id);
