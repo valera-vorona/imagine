@@ -24,7 +24,7 @@
             pos = SIZE - 1; // Move the pos to the latest item
         }
 
-        auto chunk = get_chunk_by_pos(pos);
+        const auto chunk = get_chunk_by_pos(pos);
         if (data.size() <= chunk) {
             // Chunk has not been loaded
             auto chunks_to_load = chunk - data.size() + 1;
@@ -36,7 +36,7 @@
         if (!data[chunk]) {
             // Ljoad the chunk
             data[chunk] = std::make_shared<Chunk>(CHUNK_SIZE);
-            loader->load_async(*data[chunk], CHUNK_SIZE);
+            loader->load_async(*data[chunk], CHUNK_SIZE, chunk * CHUNK_SIZE);
         }
 
         check_forward(pos);
@@ -45,7 +45,7 @@
     }
 
     void Cache::check_forward(size_t pos) {
-        Period to_load{get_chunk_by_pos(pos), get_chunk_by_pos(pos + forward.max)};
+        const Period to_load{get_chunk_by_pos(pos), get_chunk_by_pos(pos + forward.max)};
 
         for (auto chunk = to_load.min; chunk <= to_load.max; ++chunk) {
             if (data.size() <= chunk) {
@@ -55,7 +55,10 @@
             // Looad only one chunk
             if (!data[chunk]) {
                 data[chunk] = std::make_shared<Chunk>(CHUNK_SIZE);
-                loader->load_sync(*data[chunk], CHUNK_SIZE);
+                if (loader->done()) {
+                    loader->load_sync(*data[chunk], CHUNK_SIZE, chunk * CHUNK_SIZE);
+                }
+
                 break;
             }
         }

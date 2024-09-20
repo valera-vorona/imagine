@@ -4,8 +4,6 @@
 #include <GL/gl.h>
 #include <stdexcept>
 
-struct image_meta;
-
     Worker::Worker(std::string filename, int offs, int step, std::atomic_int *read, std::atomic_int *done) :
     vc(std::make_shared<cv::VideoCapture>(filename)),
     offs(offs),
@@ -17,7 +15,7 @@ struct image_meta;
 
     std::thread Worker::load(Cache::Chunk &texs, int rounds_n, size_t pos) {
         return std::thread([this, &texs, rounds_n, pos] {
-            if ((signed long int)pos != -1) {
+            if ((signed long int)pos != -1 && (size_t)vc->get(cv::CAP_PROP_POS_FRAMES) != pos) {
                 vc->set(cv::CAP_PROP_POS_FRAMES, pos);
             }
 
