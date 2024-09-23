@@ -7,6 +7,26 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 
+/* consts */
+const std::string IMAGINE_CONFIG            = "imagine.conf";
+const std::string IMAGINE_DIR               = ".imagine";
+
+/* config constants */
+const int         CFG_DEFAULT_WINDOW_WIDTH  = 1600;
+const int         CFG_DEFAULT_WINDOW_HEIGHT = 1000;
+const std::string CFG_LATEST_SEEN           = "latest_seen";
+const std::string CFG_VIEW_MODE             = "view_mode";
+const std::string CFG_VIEW_MODE_NORMAL      = "normal";
+const std::string CFG_VIEW_MODE_FULLSCREEN  = "fullscreen";
+const std::string CFG_VIDEO                 = "video";
+const std::string CFG_PAUSED                = "paused";
+const std::string CFG_FONT                  = "font";
+const std::string CFG_PATH                  = "path";
+const std::string CFG_WIDTH                 = "width";
+const std::string CFG_HEIGHT                = "height";
+const std::string CFG_DEFAULT_FONT_PATH     = "FreeSerif.ttf";
+const int         CFG_DEFAULT_FONT_HEIGHT   = 24;
+
     struct GLFWwindow;
     struct nk_context;
 

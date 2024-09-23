@@ -9,19 +9,15 @@
 
 #include <iostream>
 
-/* consts */
-const int         DEFAULT_WINDOW_WIDTH  = 1600;
-const int         DEFAULT_WINDOW_HEIGHT = 1000;
-
-const std::string IMAGINE_DIR           = ".imagine";
-const std::string IMAGINE_CONFIG        = "imagine.conf";
-
 int main(int argc, char *argv[])
 {
     /* Platform */
     static GLFWwindow *win;
     int width = 0, height = 0;
     int display_width = 0, display_height = 0;
+
+    std::string font_path;
+    int font_height;
 
     /* GUI */
     struct device device;
@@ -50,19 +46,34 @@ int main(int argc, char *argv[])
     config_stream.close();
 
     if (config.is_discarded()) {
-        width = DEFAULT_WINDOW_WIDTH;
-        height = DEFAULT_WINDOW_HEIGHT;
+        width = CFG_DEFAULT_WINDOW_WIDTH;
+        height = CFG_DEFAULT_WINDOW_HEIGHT;
     } else {
         try {
-            width  = config["width"].get<int>();
+            width  = config[CFG_WIDTH].get<int>();
         } catch (nlohmann::json::basic_json::exception &e) {
-            width = DEFAULT_WINDOW_WIDTH;
+            width = CFG_DEFAULT_WINDOW_WIDTH;
         }
 
         try {
-            height  = config["height"].get<int>();
+            height  = config[CFG_HEIGHT].get<int>();
         } catch (nlohmann::json::basic_json::exception &e) {
-            height = DEFAULT_WINDOW_HEIGHT;
+            height = CFG_DEFAULT_WINDOW_HEIGHT;
+        }
+
+        try {
+            font_path = config[CFG_FONT][CFG_PATH].get<std::string>();
+            if (!std::filesystem::exists(font_path)) {
+                font_path.clear();
+            }
+        } catch (nlohmann::json::basic_json::exception &e) {
+            font_path.clear();
+        }
+
+        try {
+            font_height = config[CFG_FONT][CFG_HEIGHT].get<int>();
+        } catch (nlohmann::json::basic_json::exception &e) {
+            font_height = CFG_DEFAULT_FONT_HEIGHT;
         }
     }
 
@@ -97,15 +108,14 @@ int main(int argc, char *argv[])
     {/* GUI */
     device_init(&device);
     {const void *image; int w, h;
-    const char *font_path = (argc > 1) ? argv[1]: 0;
 
-    struct nk_font_config cfg = nk_font_config(14);
+    struct nk_font_config cfg = nk_font_config(font_height);
     cfg.range = nk_font_cyrillic_glyph_ranges();
 
     nk_font_atlas_init_default(&atlas);
     nk_font_atlas_begin(&atlas);
-    if (font_path) font = nk_font_atlas_add_from_file(&atlas, font_path, 24.0f, &cfg);
-    else font = nk_font_atlas_add_default(&atlas, 24.0f, &cfg);
+    if (!font_path.empty()) font = nk_font_atlas_add_from_file(&atlas, font_path.c_str(), font_height, &cfg);
+    else font = nk_font_atlas_add_default(&atlas, font_height, &cfg);
     image = nk_font_atlas_bake(&atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
     device_upload_atlas(&device, image, w, h);
     nk_font_atlas_end(&atlas, nk_handle_id((int)device.font_tex), &device.tex_null);

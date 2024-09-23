@@ -7,15 +7,8 @@
 
 #include <GLFW/glfw3.h>
 #include <fstream>
+#include <filesystem>
 #include <stdexcept>
-
-/* config constants */
-const std::string CFG_LATEST_SEEN           = "latest_seen";
-const std::string CFG_VIEW_MODE             = "view_mode";
-const std::string CFG_VIEW_MODE_NORMAL      = "normal";
-const std::string CFG_VIEW_MODE_FULLSCREEN  = "fullscreen";
-const std::string CFG_VIDEO                 = "video";
-const std::string CFG_PAUSED                = "paused";
 
 int mat_to_tex(const cv::Mat &im, media_data *media) {
     using namespace cv;
@@ -285,6 +278,14 @@ void free_image(int tex) {
 
         if (!config[CFG_VIDEO][CFG_PAUSED].is_boolean()) {
              config[CFG_VIDEO][CFG_PAUSED] = false;
+        }
+
+        if (!config[CFG_FONT][CFG_PATH].is_string()) {
+             config[CFG_FONT][CFG_PATH] = std::filesystem::path(get_home_dir()) / IMAGINE_DIR / CFG_DEFAULT_FONT_PATH;
+        }
+
+        if (!config[CFG_FONT][CFG_HEIGHT].is_number()) {
+             config[CFG_FONT][CFG_HEIGHT] = CFG_DEFAULT_FONT_HEIGHT;
         }
     }
 
