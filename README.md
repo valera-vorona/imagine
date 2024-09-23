@@ -26,7 +26,7 @@ sudo apt install build-essential git git-lfs cmake libglfw3-dev libglew-dev libo
 ### Typical installation path:
 
 * cd to the dir you whant to install imagine source code to;
-* Clone image source code from git:
+* Clone imagine source code from git:
 ```
 git clone git@github.com:valera-vorona/imagine.git
 ```
