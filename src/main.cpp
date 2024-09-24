@@ -65,10 +65,10 @@ int main(int argc, char *argv[])
         try {
             font_path = config[CFG_FONT][CFG_PATH].get<std::string>();
             if (!std::filesystem::exists(font_path)) {
-                font_path = std::filesystem::path(get_install_dir()) / IMAGINE_INSTALL_DIR / CFG_DEFAULT_FONT_PATH;
+                font_path = std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / CFG_DEFAULT_FONT_PATH;
             }
         } catch (nlohmann::json::basic_json::exception &e) {
-           font_path = std::filesystem::path(get_install_dir()) / IMAGINE_INSTALL_DIR / CFG_DEFAULT_FONT_PATH;
+           font_path = std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / CFG_DEFAULT_FONT_PATH;
         }
         if (!std::filesystem::exists(font_path)) {
             font_path.clear();
