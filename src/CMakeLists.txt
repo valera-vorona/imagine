@@ -1,4 +1,4 @@
-project(imagine VERSION 0.0.1 LANGUAGES CXX)
+project(imagine VERSION 0.0.3 LANGUAGES CXX)
 
 # this line with the files *.cmake in cmake/ dir are necessary to link GLFW library 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/")
