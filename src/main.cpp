@@ -50,13 +50,13 @@ int main(int argc, char *argv[])
         height = CFG_DEFAULT_WINDOW_HEIGHT;
     } else {
         try {
-            width  = config[CFG_WIDTH].get<int>();
+            width  = config[CFG_WINDOW][CFG_WIDTH].get<int>();
         } catch (nlohmann::json::basic_json::exception &e) {
             width = CFG_DEFAULT_WINDOW_WIDTH;
         }
 
         try {
-            height  = config[CFG_HEIGHT].get<int>();
+            height  = config[CFG_WINDOW][CFG_HEIGHT].get<int>();
         } catch (nlohmann::json::basic_json::exception &e) {
             height = CFG_DEFAULT_WINDOW_HEIGHT;
         }

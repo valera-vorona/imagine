@@ -280,6 +280,14 @@ void free_image(int tex) {
              config[CFG_VIDEO][CFG_PAUSED] = false;
         }
 
+        if (!config[CFG_WINDOW][CFG_WIDTH].is_number()) {
+             config[CFG_WINDOW][CFG_WIDTH] = CFG_DEFAULT_WINDOW_WIDTH;
+        }
+
+        if (!config[CFG_WINDOW][CFG_HEIGHT].is_number()) {
+             config[CFG_WINDOW][CFG_HEIGHT] = CFG_DEFAULT_WINDOW_HEIGHT;
+        }
+
         if (!config[CFG_FONT][CFG_PATH].is_string()) {
              config[CFG_FONT][CFG_PATH] = std::filesystem::path(get_home_dir()) / IMAGINE_DIR / CFG_DEFAULT_FONT_PATH;
         }

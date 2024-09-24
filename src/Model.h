@@ -22,6 +22,7 @@ const std::string CFG_VIDEO                 = "video";
 const std::string CFG_PAUSED                = "paused";
 const std::string CFG_FONT                  = "font";
 const std::string CFG_PATH                  = "path";
+const std::string CFG_WINDOW                = "window";
 const std::string CFG_WIDTH                 = "width";
 const std::string CFG_HEIGHT                = "height";
 const std::string CFG_DEFAULT_FONT_PATH     = "FreeSerif.ttf";
