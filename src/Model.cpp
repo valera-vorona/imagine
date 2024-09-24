@@ -156,8 +156,8 @@ void free_image(int tex) {
     }
 
     void Model::set_size(int width, int height) {
-        content_width = width;
-        content_height = height;
+        config[CFG_WINDOW][CFG_WIDTH] = content_width = width;
+        config[CFG_WINDOW][CFG_HEIGHT] = content_height = height;
     }
 
     void Model::draw() {
