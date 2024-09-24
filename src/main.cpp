@@ -4,6 +4,7 @@
 #include <fstream>
 #include <thread>
 #include <chrono>
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include "FileBrowser.h"
 
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
     /* GUI */
     struct device device;
     struct nk_context ctx;
-    struct nk_font *font;
+    struct nk_font *font = 0;
     struct nk_font_atlas atlas;
 
     std::string config_file = get_home_dir();
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
     if (config_file.empty()) {
         //TODO: Home dir is not found, try to run without config somehow
     } else {
-        config_file = std::filesystem::path(config_file) / IMAGINE_DIR;
+        config_file = std::filesystem::path(config_file) / IMAGINE_HOME_DIR;
         if (!std::filesystem::exists(config_file)) {
             std::filesystem::create_directory(config_file);
         }
@@ -64,9 +65,12 @@ int main(int argc, char *argv[])
         try {
             font_path = config[CFG_FONT][CFG_PATH].get<std::string>();
             if (!std::filesystem::exists(font_path)) {
-                font_path.clear();
+                font_path = std::filesystem::path(get_install_dir()) / IMAGINE_INSTALL_DIR / CFG_DEFAULT_FONT_PATH;
             }
         } catch (nlohmann::json::basic_json::exception &e) {
+           font_path = std::filesystem::path(get_install_dir()) / IMAGINE_INSTALL_DIR / CFG_DEFAULT_FONT_PATH;
+        }
+        if (!std::filesystem::exists(font_path)) {
             font_path.clear();
         }
 
@@ -114,8 +118,14 @@ int main(int argc, char *argv[])
 
     nk_font_atlas_init_default(&atlas);
     nk_font_atlas_begin(&atlas);
-    if (!font_path.empty()) font = nk_font_atlas_add_from_file(&atlas, font_path.c_str(), font_height, &cfg);
-    else font = nk_font_atlas_add_default(&atlas, font_height, &cfg);
+    if (!font_path.empty()) {
+        font = nk_font_atlas_add_from_file(&atlas, font_path.c_str(), font_height, &cfg);
+    }
+
+    if (!font) {
+        font = nk_font_atlas_add_default(&atlas, font_height, &cfg);
+    }
+
     image = nk_font_atlas_bake(&atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
     device_upload_atlas(&device, image, w, h);
     nk_font_atlas_end(&atlas, nk_handle_id((int)device.font_tex), &device.tex_null);

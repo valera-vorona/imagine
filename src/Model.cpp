@@ -289,7 +289,7 @@ void free_image(int tex) {
         }
 
         if (!config[CFG_FONT][CFG_PATH].is_string()) {
-             config[CFG_FONT][CFG_PATH] = std::filesystem::path(get_home_dir()) / IMAGINE_DIR / CFG_DEFAULT_FONT_PATH;
+             config[CFG_FONT][CFG_PATH] = std::filesystem::path(get_install_dir()) / IMAGINE_INSTALL_DIR / CFG_DEFAULT_FONT_PATH;
         }
 
         if (!config[CFG_FONT][CFG_HEIGHT].is_number()) {

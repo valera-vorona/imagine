@@ -9,7 +9,8 @@
 
 /* consts */
 const std::string IMAGINE_CONFIG            = "imagine.conf";
-const std::string IMAGINE_DIR               = ".imagine";
+const std::string IMAGINE_INSTALL_DIR      = "imagine";
+const std::string IMAGINE_HOME_DIR          = ".imagine";
 
 /* config constants */
 const int         CFG_DEFAULT_WINDOW_WIDTH  = 1600;
