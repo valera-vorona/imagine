@@ -34,13 +34,10 @@ set(SOURCE_EXE
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_EXE})
+target_compile_definitions(${PROJECT_NAME} PRIVATE CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW3_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${OpenCV_INCLUDE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${GLFW3_LIBRARY} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${OpenCV_LIBRARIES} ${nlohmann_json_LIBRARY})
-
-#target_include_directories(${PROJECT_NAME}
-#    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
-#)
 

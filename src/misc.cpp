@@ -1,11 +1,14 @@
 #include "misc.h"
 #include <memory>
 #include <vector>
-#include <filesystem>
 #include <stdexcept>
 
+#ifndef CMAKE_INSTALL_PREFIX
+    #include <filesystem>
+#endif
+
 #ifndef _WIN32
-#include <pwd.h>
+    #include <pwd.h>
 #endif
 
 #include "Model.h"
@@ -31,8 +34,13 @@ std::string get_home_dir() {
     return rv;
 }
 
-//TODO: I know this function is implemented bad. I should find out how to reffer to CMAKR_INSTALL_FREFIX
-// or something like that to get the project's install dir
+#ifdef CMAKE_INSTALL_PREFIX
+
+std::string get_install_dir() {
+    return CMAKE_INSTALL_PREFIX;
+}
+
+#else
 
 std::string get_install_dir() {
     namespace fs = std::filesystem;
@@ -49,7 +57,7 @@ std::string get_install_dir() {
     };
 
     for (auto p : paths) {
-        auto f =  fs::path(p) / IMAGINE_INSTALL_DIR;
+        auto f = fs::path(p) / IMAGINE_INSTALL_DIR;
         if (fs::exists(f)) {
             return f;
         }
@@ -57,4 +65,6 @@ std::string get_install_dir() {
 
     return std::string();
 }
+
+#endif
 
