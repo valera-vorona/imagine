@@ -3,6 +3,8 @@
 #include <cstring>
 #include <stdexcept>
 
+    char View::path_buffer[MAX_PATH_LEN]; // static path_buffer is shared among all the views
+
     View::View(Model *model, const char *path) : model(model) {
         if (!model) {
           throw std::runtime_error("Error creating View, Model class pointer not provided");
