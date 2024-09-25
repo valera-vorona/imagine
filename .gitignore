@@ -49,10 +49,10 @@ doc/
 *.swp
 
 #Images
-icon/
-*.jpg
-*.jpeg
-*.png
+#icon/
+#*.jpg
+#*.jpeg
+#*.png
 
 #Misc
 .vscode/

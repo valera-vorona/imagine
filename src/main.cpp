@@ -101,6 +101,18 @@ int main(int argc, char *argv[])
     glfwSetMouseButtonCallback(win, mouse_button_input);
     glfwSetScrollCallback(win, scroll_input);
 
+    /* Set window icon */
+    {
+    using namespace cv;
+
+    std::string icon_path = std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON;
+    auto im = imread(icon_path.c_str(), IMREAD_UNCHANGED);
+    if (!im.empty()) {
+        GLFWimage icon = { im.size().width, im.size().height, im.ptr() };
+        glfwSetWindowIcon(win, 1, &icon);
+    }
+    }
+
     /* OpenGL */
     glViewport(0, 0, width, height);
     glewExperimental = 1;

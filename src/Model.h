@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 
 /* consts */
+const std::string APP_ICON                  = "icon.png";
 const std::string IMAGINE_CONFIG            = "imagine.conf";
 const std::string IMAGINE_INSTALL_DIR       = "imagine";
 const std::string IMAGINE_HOME_DIR          = ".imagine";
