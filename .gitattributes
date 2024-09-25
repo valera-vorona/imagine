@@ -1,2 +1,1 @@
-assets/git-lfs-files/* filter=lfs diff=lfs merge=lfs -text
-assets/git-lfs-files/install/* filter=lfs diff=lfs merge=lfs -text
+assets/git-lfs-files/** filter=lfs diff=lfs merge=lfs -text
