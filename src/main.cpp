@@ -105,12 +105,23 @@ int main(int argc, char *argv[])
     {
     using namespace cv;
 
-    std::string icon_path = std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON;
-    auto im = imread(icon_path.c_str(), IMREAD_UNCHANGED);
-    if (!im.empty()) {
-        GLFWimage icon = { im.size().width, im.size().height, im.ptr() };
-        glfwSetWindowIcon(win, 1, &icon);
+    std::vector<std::string> icon_paths = {
+        std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON_MIN,
+        std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON_MID,
+        std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON_MAX
+    };
+
+    GLFWimage icons[3];
+    int i = 0;
+
+    for (auto icon_path : icon_paths) {
+        auto im = imread(icon_path.c_str(), IMREAD_UNCHANGED);
+        if (!im.empty()) {
+            icons[i++] = { im.size().width, im.size().height, im.ptr() };
+        }
     }
+
+    glfwSetWindowIcon(win, i, icons);
     }
 
     /* OpenGL */
