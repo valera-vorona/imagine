@@ -105,19 +105,22 @@ int main(int argc, char *argv[])
     {
     using namespace cv;
 
+    const int ICONS_NUM = 3;
     std::vector<std::string> icon_paths = {
         std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON_MIN,
         std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON_MID,
         std::filesystem::path(get_install_dir()) / SHARE_DIR / IMAGINE_INSTALL_DIR / APP_ICON_MAX
     };
 
-    GLFWimage icons[3];
+    Mat im[ICONS_NUM];
+    GLFWimage icons[ICONS_NUM];
     int i = 0;
 
     for (auto icon_path : icon_paths) {
-        auto im = imread(icon_path.c_str(), IMREAD_UNCHANGED);
-        if (!im.empty()) {
-            icons[i++] = { im.size().width, im.size().height, im.ptr() };
+        im[i] = imread(icon_path.c_str(), IMREAD_UNCHANGED);
+        if (!im[i].empty()) {
+            icons[i] = { im[i].size().width, im[i].size().height, im[i].ptr() };
+            ++i;
         }
     }
 
