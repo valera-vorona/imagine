@@ -1,7 +1,6 @@
 #include "FullScreenView.h"
 #include "Model.h"
 
-//#define NK_IMPLEMENTATION
 #include "nuklear.h"
 
 #include <stdexcept>
@@ -13,7 +12,7 @@
     void FullScreenView::draw(int content_width, int content_height, media_data *media, bool show_progress) {
         auto ctx = model->get_context();
 
-        if (!nk_begin(ctx, "FullScreenView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {
+        if (!nk_begin(ctx, "FullScreenView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_NO_SCROLLBAR)) {
           nk_end(ctx);
           throw std::runtime_error("Error beginning FullScreenView");
         }

@@ -1,7 +1,6 @@
 #include "NormalView.h"
 #include "Model.h"
 
-//#define NK_IMPLEMENTATION
 #include "nuklear.h"
 
 #include <stdexcept>
@@ -25,7 +24,7 @@
         auto ctx = model->get_context();
         auto browser = model->get_browser();
 
-        if (!nk_begin(ctx, "NormalView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_BORDER)) {
+        if (!nk_begin(ctx, "NormalView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_NO_SCROLLBAR)) {
           nk_end(ctx);
           throw std::runtime_error("Error beginning NormalView");
         }
@@ -87,7 +86,7 @@
         nk_layout_row_template_end(ctx);
 
         //  File list
-        if (nk_group_begin(ctx, "File list", NK_WINDOW_BORDER)) {
+        if (nk_group_begin(ctx, "File list", 0)) {
             bool active_gone_through = false;
 
             nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
@@ -128,7 +127,7 @@
         //nk_group_set_scroll(ctx, "File list", 0, y_offset);
 
         // Image
-        if (nk_group_begin(ctx, "Image", NK_WINDOW_BORDER)) {
+        if (nk_group_begin(ctx, "Image", 0)) {
             width -= 20;
             height -= 20; // TODO: case 1: deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
 
