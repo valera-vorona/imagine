@@ -19,6 +19,8 @@
 
         Cache(Period backward, Period forward, size_t size, std::shared_ptr<Loader> loader);
 
+        inline const Chunks get_chunks() const { return data; }
+
         class iterator {
         public:
             iterator() = default;
@@ -51,9 +53,12 @@
         Period forward;
         const size_t SIZE;
         Chunks data;
+
+    public:
         const size_t CHUNK_SIZE;
         const size_t MAX_CHUNKS_NUM;
 
+    protected:
         std::shared_ptr<Loader> loader;
     };
 

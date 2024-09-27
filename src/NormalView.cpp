@@ -16,10 +16,13 @@
      * Image menu line  (h=48)
      * FIle list w=300 | Image w=* (h=*)
      *                 | (optionally progress bar h=16) 
+     *                 | (optionally loader bar h=8)
      * Status bar       (h=24)
     */
     void NormalView::draw(int content_width, int content_height, struct media_data *media, bool show_progress) {
         static const int LINE_HEIGHT = 24;
+        static const int PROGRESS_HEIGHT    = 16;
+        static const int LOADER_HEIGHT      = 8;
 
         auto ctx = model->get_context();
         auto browser = model->get_browser();
@@ -78,7 +81,7 @@
         // Width is the whole window width - width of file list
         int width = nk_window_get_content_region_size(ctx).x - 400;
         // Height is calculated from the window content region height - sum of all the others' widget sizes
-        int height = nk_window_get_content_region_size(ctx).y - LINE_HEIGHT * 7;
+        int height = nk_window_get_content_region_size(ctx).y - LINE_HEIGHT * (show_progress ? 7 : 6);
         int y_offset = 0; // offset in pixels of the active file
         nk_layout_row_template_begin(ctx, height);
             nk_layout_row_template_push_static(ctx, 400);
@@ -132,7 +135,7 @@
             height -= 20; // TODO: case 1: deducting the group's border size which is found experementally, it is better to find out how to find the size of the current group in the nuklear code
 
             if (show_progress) {
-                height -= 20; // it should be progress bar height + 4 by experiment. Perhaps it is the bar's or the group's border 
+                height -= (PROGRESS_HEIGHT + LOADER_HEIGHT) * 2 - 16;
             }
 
             // calculating aspect ratios of the image and the view
@@ -151,8 +154,10 @@
 
             // Progress bar
             if (show_progress) {
-                nk_layout_row_static(ctx, 16 , width, 1);
+                nk_layout_row_static(ctx, PROGRESS_HEIGHT , width, 1);
                 nk_progress(ctx, model->get_video_pos_ptr(), model->get_video_frames_n(), nk_true);
+                nk_layout_row_static(ctx, LOADER_HEIGHT, width, 1);
+                draw_loader_bar_widget();
             }
 
             nk_group_end(ctx);

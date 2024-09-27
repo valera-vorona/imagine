@@ -14,6 +14,8 @@
         static void set_full_path(const char *path); // throw std::runtime_error
 
     protected:
+        void draw_loader_bar_widget();
+
         static const int MAX_PATH_LEN = 4096;
 
         Model *model;

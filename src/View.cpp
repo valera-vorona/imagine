@@ -1,4 +1,7 @@
 #include "View.h"
+#include "Model.h"
+
+#include "nuklear.h"
 
 #include <cstring>
 #include <stdexcept>
@@ -20,6 +23,27 @@
             throw std::runtime_error("Path too long");
         } else {
             strcpy(path_buffer, path);
+        }
+    }
+
+    void View::draw_loader_bar_widget() {
+        auto ctx = model->get_context();
+
+        nk_command_buffer *canvas = nk_window_get_canvas(ctx);
+
+        struct nk_rect space;
+        enum nk_widget_layout_states state = nk_widget(&space, ctx);
+        if (state) {
+            auto cache = model->get_cache();
+            auto chunks = cache->get_chunks();
+            const auto chunks_num = cache->MAX_CHUNKS_NUM;
+            space.w /= chunks_num;
+            ++space.w; // -- to see a gap between chunks
+
+            for (auto i = 0; i < chunks_num; ++i) {
+                nk_fill_rect(canvas, space, 0, (i < chunks.size() && chunks[i] != nullptr) ? nk_rgb(80, 80, 80) : nk_rgb(180, 180, 180));
+                space.x += space.w - 1; // +1 to compensate the gap
+            }
         }
     }
 

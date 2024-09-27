@@ -34,7 +34,7 @@
         }
 
         if (!data[chunk]) {
-            // Ljoad the chunk
+            // Load the chunk
             data[chunk] = std::make_shared<Chunk>(CHUNK_SIZE);
             loader->load_async(*data[chunk], CHUNK_SIZE, chunk * CHUNK_SIZE);
         }

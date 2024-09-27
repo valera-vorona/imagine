@@ -10,7 +10,8 @@
     }
 
     void FullScreenView::draw(int content_width, int content_height, media_data *media, bool show_progress) {
-        static const int PROGRESS_HEIGHT = 16;
+        static const int PROGRESS_HEIGHT    = 16;
+        static const int LOADER_HEIGHT      = 16;
 
         auto ctx = model->get_context();
 
@@ -26,7 +27,7 @@
 
         auto size = nk_window_get_content_region_size(ctx);
         const int width = size.x;
-        const int height = show_progress ? size.y - PROGRESS_HEIGHT : size.y;
+        const int height = show_progress ? size.y - PROGRESS_HEIGHT - LOADER_HEIGHT : size.y;
 
         // Image
         // calculating aspect ratios of the image and the view
@@ -56,6 +57,8 @@
         if (show_progress) {
             nk_layout_row_static(ctx, PROGRESS_HEIGHT , size.x, 1);
             nk_progress(ctx, model->get_video_pos_ptr(), model->get_video_frames_n(), nk_true);
+            nk_layout_row_static(ctx, LOADER_HEIGHT , size.x, 1);
+            draw_loader_bar_widget();
         }
 
         // Restoring window padding
