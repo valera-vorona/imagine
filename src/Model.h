@@ -81,6 +81,7 @@ const int         CFG_DEFAULT_FONT_HEIGHT   = 24;
         inline double get_video_fps() const { return current_media.fps; }
         inline double get_video_frames_n() const { return current_media.frames_n; }
         inline size_t *get_video_pos_ptr() { return &current_media.pos; }
+        inline const std::shared_ptr<Cache> get_cache() const { return cache; }
 
         void set_size(int width, int height);
 
