@@ -155,6 +155,7 @@ int main(int argc, char *argv[])
     image = nk_font_atlas_bake(&atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
     device_upload_atlas(&device, image, w, h);
     nk_font_atlas_end(&atlas, nk_handle_id((int)device.font_tex), &device.tex_null);
+    nk_font_atlas_cleanup(&atlas);
     }
 
     nk_init_default(&ctx, &font->handle);}
