@@ -15,7 +15,7 @@
         auto ctx = model->get_context();
 
         // Setting window padding to 0
-        // TRICK: it's not documented in nuklear library, but I don't know how to set window padding to 0 in a different way
+        //TRICK: it's not documented in nuklear library, but I don't know how to set window padding to 0 in a different way
         auto padding = ctx->style.window.padding;
         ctx->style.window.padding = {0., 0.};
 
@@ -34,11 +34,20 @@
         const float ar_view  = (float)width / (float)height;
 
         if (ar_image > ar_view) {
-            nk_layout_row_static(ctx, (float)width / ar_image , width, 1);
+            const float content_height = (float)width / ar_image;
+            const float margin_height = ((float)height - content_height) / 2.;
+            nk_layout_row_static(ctx, margin_height, width, 1);
+            nk_spacer(ctx);
+            nk_layout_row_static(ctx, content_height , width, 1);
             //TODO: I create nk_image here every frame, maybe I should prepare it outside this function and send it as an argument
             nk_image(ctx, nk_image_id(media->id));
         } else {
-            nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
+            //nk_layout_row_static(ctx, height, (float)height * ar_image, 1);
+            const float content_width = (float)height * ar_image;
+            const float margin_width = ((float)width - content_width) / 2;
+            const float ratio[] = { margin_width, content_width };
+            nk_layout_row(ctx, NK_STATIC, height, 2, ratio);
+            nk_spacer(ctx);
             //TODO: the same as above
             nk_image(ctx, nk_image_id(media->id));
         }
