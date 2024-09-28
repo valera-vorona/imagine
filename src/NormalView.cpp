@@ -41,6 +41,7 @@
                 nk_layout_row_static(ctx, LINE_HEIGHT, 100, 1);
                     if (nk_menu_item_label(ctx, "Options", NK_TEXT_ALIGN_LEFT | NK_TEXT_ALIGN_MIDDLE)) {
                         show_options = true;
+                        nk_window_show(ctx, "OptionsView", NK_SHOWN);
                     }
                 nk_layout_row_static(ctx, LINE_HEIGHT, 100, 1);
                     nk_menu_item_label(ctx, "Quit", NK_TEXT_ALIGN_LEFT | NK_TEXT_ALIGN_MIDDLE);
@@ -187,9 +188,8 @@
     void NormalView::draw_options(int content_width, int content_height) {
         auto ctx = model->get_context();
 
-        if (!nk_begin_titled(ctx, "OptionsView", "Options", nk_rect(50, 50, content_width - 100, content_height - 100), NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-          nk_end(ctx);
-          throw std::runtime_error("Error beginning OptionsView");
+        if (nk_begin_titled(ctx, "OptionsView", "Options", nk_rect(50, 50, content_width - 100, content_height - 100), NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_CLOSABLE)) {
+
         }
 
         nk_end(ctx);
