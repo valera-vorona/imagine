@@ -20,7 +20,7 @@
      * Status bar       (h=24)
     */
     void NormalView::draw(int content_width, int content_height, struct media_data *media, bool show_progress) {
-        static const int LINE_HEIGHT = 24;
+        static const int LINE_HEIGHT        = 24;
         static const int PROGRESS_HEIGHT    = 16;
         static const int LOADER_HEIGHT      = 8;
 
@@ -33,10 +33,21 @@
         }
 
         // Menu
-        nk_layout_row_static(ctx, LINE_HEIGHT, 100, 3);
-          nk_button_label(ctx, "File");
-          nk_button_label(ctx, "Edit");
-          nk_button_label(ctx, "Help");
+        nk_menubar_begin(ctx);
+            nk_layout_row_static(ctx, LINE_HEIGHT, 100, 1);
+            if (nk_menu_begin_label(ctx, "File", NK_TEXT_ALIGN_LEFT | NK_TEXT_ALIGN_MIDDLE, {100, 1000})) {
+                nk_layout_row_static(ctx, LINE_HEIGHT, 100, 1);
+                    nk_menu_item_label(ctx, "Open", NK_TEXT_ALIGN_LEFT | NK_TEXT_ALIGN_MIDDLE);
+                nk_layout_row_static(ctx, LINE_HEIGHT, 100, 1);
+                    if (nk_menu_item_label(ctx, "Options", NK_TEXT_ALIGN_LEFT | NK_TEXT_ALIGN_MIDDLE)) {
+                        show_options = true;
+                        nk_window_show(ctx, "OptionsView", NK_SHOWN);
+                    }
+                nk_layout_row_static(ctx, LINE_HEIGHT, 100, 1);
+                    nk_menu_item_label(ctx, "Quit", NK_TEXT_ALIGN_LEFT | NK_TEXT_ALIGN_MIDDLE);
+                nk_menu_end(ctx);
+            }
+        nk_menubar_end(ctx);
 
         // Path edit line
         nk_layout_row_template_begin(ctx, LINE_HEIGHT * 2);
@@ -166,6 +177,20 @@
         // Status bar
         nk_layout_row_dynamic(ctx, LINE_HEIGHT, 1);
           nk_label(ctx, model->get_status().c_str(),  NK_TEXT_LEFT);
+
+        nk_end(ctx);
+
+        if (show_options) {
+            draw_options(content_width, content_height);
+        }
+    }
+
+    void NormalView::draw_options(int content_width, int content_height) {
+        auto ctx = model->get_context();
+
+        if (nk_begin_titled(ctx, "OptionsView", "Options", nk_rect(50, 50, content_width - 100, content_height - 100), NK_WINDOW_BORDER | NK_WINDOW_TITLE | NK_WINDOW_CLOSABLE)) {
+
+        }
 
         nk_end(ctx);
     }
