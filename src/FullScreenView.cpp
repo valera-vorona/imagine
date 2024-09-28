@@ -16,9 +16,7 @@
         auto ctx = model->get_context();
 
         // Setting window padding to 0
-        //TRICK: it's not documented in nuklear library, but I don't know how to set window padding to 0 in a different way
-        auto padding = ctx->style.window.padding;
-        ctx->style.window.padding = {0., 0.};
+        nk_style_push_vec2(ctx, &ctx->style.window.padding, {0, 0});
 
         if (!nk_begin(ctx, "FullScreenView", nk_rect(0, 0, content_width, content_height), NK_WINDOW_NO_SCROLLBAR)) {
             nk_end(ctx);
@@ -62,7 +60,7 @@
         }
 
         // Restoring window padding
-        ctx->style.window.padding = padding;
+        nk_style_pop_vec2(ctx);
 
         nk_end(ctx);
     }

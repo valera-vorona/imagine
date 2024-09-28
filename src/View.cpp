@@ -38,7 +38,7 @@
             auto chunks = cache->get_chunks();
             const auto chunks_num = cache->MAX_CHUNKS_NUM;
             space.w /= chunks_num;
-            ++space.w; // -- to see a gap between chunks
+            ++space.w; // -- not to see a gap between chunks
 
             for (auto i = 0; i < chunks_num; ++i) {
                 nk_fill_rect(canvas, space, 0, (i < chunks.size() && chunks[i] != nullptr) ? nk_rgb(80, 80, 80) : nk_rgb(180, 180, 180));
