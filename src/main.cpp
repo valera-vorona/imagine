@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
 
     glfwSetWindowUserPointer(win, &model);
     glfwSetInputMode(win, GLFW_STICKY_KEYS, GLFW_FALSE);
+    glfwSetInputMode(win, GLFW_STICKY_MOUSE_BUTTONS, GLFW_FALSE);
 
     while (!glfwWindowShouldClose(win))
     {

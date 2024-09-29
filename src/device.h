@@ -261,43 +261,43 @@ void error_callback(int e, const char *d){
 
 void text_input(GLFWwindow *win, unsigned int codepoint) {
     auto ctx = ((Model *)glfwGetWindowUserPointer(win))->get_context();
-
+return;
     nk_input_begin(ctx);
     nk_input_unicode(ctx, codepoint);
     nk_input_end(ctx);
 }
 
 void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
-    Model *model = (Model *)glfwGetWindowUserPointer(win);
-    auto ctx = model->get_context();
+    if (action == GLFW_PRESS || action == GLFW_RELEASE) {
+        Model *model = (Model *)glfwGetWindowUserPointer(win);
+        auto ctx = model->get_context();
 
-    if (action == GLFW_PRESS) {
         nk_input_begin(ctx);
 
         switch (key) {
             case GLFW_KEY_DELETE:
-                nk_input_key(ctx, NK_KEY_DEL, 1);
+                nk_input_key(ctx, NK_KEY_DEL, action == GLFW_PRESS);
                 break;
 
             case GLFW_KEY_ENTER:
                 model->enter();
-                nk_input_key(ctx, NK_KEY_ENTER, 1);
+                nk_input_key(ctx, NK_KEY_ENTER, action == GLFW_PRESS);
                 break;
 
             case GLFW_KEY_TAB:
-                nk_input_key(ctx, NK_KEY_TAB, 1);
+                nk_input_key(ctx, NK_KEY_TAB, action == GLFW_PRESS);
                 break;
 
             case GLFW_KEY_BACKSPACE:
-                nk_input_key(ctx, NK_KEY_BACKSPACE, 1);
+                nk_input_key(ctx, NK_KEY_BACKSPACE, action == GLFW_PRESS);
                 break;
 
             case GLFW_KEY_LEFT:
-                nk_input_key(ctx, NK_KEY_LEFT, 1);
+                nk_input_key(ctx, NK_KEY_LEFT, action == GLFW_PRESS);
                 break;
 
             case GLFW_KEY_RIGHT:
-                nk_input_key(ctx, NK_KEY_RIGHT, 1);
+                nk_input_key(ctx, NK_KEY_RIGHT, action == GLFW_PRESS);
                 break;
 
             case GLFW_KEY_SPACE:
@@ -318,15 +318,21 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
                 break;
 
             case GLFW_KEY_UP:
-                model->up();
+                if (action == GLFW_PRESS) {
+                    model->up();
+                }
                 break;
 
             case GLFW_KEY_DOWN:
-                model->down();
+                if (action == GLFW_PRESS) {
+                    model->down();
+                }
                 break;
 
             case GLFW_KEY_F:
-                model->toggle_view_mode();
+                if (action == GLFW_PRESS) {
+                    model->toggle_view_mode();
+                }
                 break;
         }
 
