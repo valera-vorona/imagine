@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
     model.add_browser(std::make_shared<FileBrowser>());
 
     glfwSetWindowUserPointer(win, &model);
-    glfwSetInputMode(win, GLFW_STICKY_KEYS, GLFW_TRUE);
+    glfwSetInputMode(win, GLFW_STICKY_KEYS, GLFW_FALSE);
 
     while (!glfwWindowShouldClose(win))
     {

@@ -271,7 +271,7 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
     Model *model = (Model *)glfwGetWindowUserPointer(win);
     auto ctx = model->get_context();
 
-    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+    if (action == GLFW_PRESS) {
         nk_input_begin(ctx);
 
         switch (key) {
