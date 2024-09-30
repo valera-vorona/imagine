@@ -280,7 +280,9 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
                 break;
 
             case GLFW_KEY_ENTER:
-                model->enter();
+                if (action == GLFW_PRESS) {
+                    model->enter();
+                }
                 nk_input_key(ctx, NK_KEY_ENTER, action == GLFW_PRESS);
                 break;
 
@@ -301,7 +303,9 @@ void key_input(GLFWwindow* win, int key, int scancode, int action, int mods) {
                 break;
 
             case GLFW_KEY_SPACE:
-                model->toggle_video_play();
+                if (action == GLFW_PRESS) {
+                    model->toggle_video_play();
+                }
                 break;
 
             case GLFW_KEY_C:
